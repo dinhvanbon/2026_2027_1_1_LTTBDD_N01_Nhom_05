@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "888213272879",
+    "project_id": "life-rpg-app-94f1c",
+    "storage_bucket": "life-rpg-app-94f1c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:888213272879:android:01dc933e70f75a42c549da",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCVRMGdwdFcz5tlXuQgaG0fwSHvZ1ZVgDY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
