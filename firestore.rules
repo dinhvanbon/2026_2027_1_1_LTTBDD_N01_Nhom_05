@@ -1,0 +1,118 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isParent() {
+      return signedIn() && userRole() == 'parent';
+    }
+
+    function isChild() {
+      return signedIn() && userRole() == 'child';
+    }
+
+    match /users/{userId} {
+  allow read: if isOwner(userId) || isParent();
+  allow create: if signedIn() && request.auth.uid == userId;
+  allow update: if isOwner(userId) || isParent();
+
+      match /rewards/{rewardId} {
+  allow read: if isOwner(userId) || isParent();
+  allow create, update, delete: if isOwner(userId) || isParent();
+}
+
+      match /rewardHistory/{historyId} {
+        allow read: if isOwner(userId) || isParent();
+        allow create: if isOwner(userId);
+      }
+
+      match /achievements/{achievementId} {
+        allow read, write: if isOwner(userId) || isParent();
+      }
+
+      match /activities/{activityId} {
+        allow read, write: if isOwner(userId) || isParent();
+      }
+    }
+
+    match /children/{childId} {
+
+      allow read: if signedIn();
+
+      allow create: if isChild();
+
+      allow update: if signedIn() &&
+        (
+          request.auth.uid == childId ||
+          isParent()
+        );
+
+      allow delete: if false;
+
+      match /rewards/{rewardId} {
+        allow read: if isOwner(childId) || isParent();
+        allow create, update, delete: if isParent();
+      }
+
+      match /rewardHistory/{historyId} {
+        allow read: if isOwner(childId) || isParent();
+        allow create: if isOwner(childId);
+      }
+    }
+
+    match /parents/{parentId} {
+  allow read, write: if isOwner(parentId);
+
+  match /children/{childId} {
+    allow read, write: if isOwner(parentId);
+  }
+}
+
+    match /tasks/{taskId} {
+      allow read: if signedIn() &&
+        (
+          resource.data.parentId == request.auth.uid ||
+          resource.data.childId == request.auth.uid
+        );
+
+      allow create: if isParent() &&
+        request.resource.data.parentId == request.auth.uid;
+
+      allow update: if signedIn() &&
+        (
+          resource.data.parentId == request.auth.uid ||
+          resource.data.childId == request.auth.uid
+        );
+
+      allow delete: if isParent() &&
+        resource.data.parentId == request.auth.uid;
+    }
+
+    match /rewards/{rewardId} {
+      allow read, write: if isParent();
+    }
+
+    match /rewardHistory/{historyId} {
+      allow read, write: if signedIn();
+    }
+
+    match /notificationRequests/{notificationId} {
+      allow create: if signedIn();
+      allow read: if signedIn() &&
+        resource.data.receiverId == request.auth.uid;
+      allow update, delete: if false;
+    }
+  }
+}

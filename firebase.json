@@ -1,0 +1,45 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "life-rpg-app-94f1c",
+          "appId": "1:888213272879:android:01dc933e70f75a42c549da",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "life-rpg-app-94f1c",
+          "configurations": {
+            "android": "1:888213272879:android:01dc933e70f75a42c549da",
+            "ios": "1:888213272879:ios:4c4b8a6a80427889c549da",
+            "macos": "1:888213272879:ios:4c4b8a6a80427889c549da",
+            "web": "1:888213272879:web:40bfd42baef477c2c549da",
+            "windows": "1:888213272879:web:6c531a7da86dd83ec549da"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ],
+  "firestore": {
+    "database": "(default)",
+    "location": "asia-southeast1",
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}
