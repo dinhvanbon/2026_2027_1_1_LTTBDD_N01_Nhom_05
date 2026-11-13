@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +17,17 @@ import 'screens/auth/role_select_screen.dart';
 import 'screens/parent/parent_main_navigation_screen.dart';
 import 'screens/child/child_main_navigation_screen.dart';
 import 'providers/family_provider.dart';
+
+class AppScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.mouse,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.unknown,
+  };
+}
 
 class LifeRPGApp extends StatelessWidget {
   const LifeRPGApp({super.key});
@@ -60,11 +72,14 @@ class LifeRPGApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Life RPG',
+        scrollBehavior: AppScrollBehavior(),
         theme: ThemeData(
           useMaterial3: true,
           colorSchemeSeed: Colors.deepPurple,
         ),
         builder: (context, child) {
+          final Widget appContent = child ?? const SizedBox();
+
           return LayoutBuilder(
             builder: (context, constraints) {
               // Khi chạy trên máy tính hoặc Web màn hình rộng
@@ -72,7 +87,10 @@ class LifeRPGApp extends StatelessWidget {
                 const double mobileWidth = 420.0;
                 final double targetHeight = constraints.maxHeight > 900
                     ? 860.0
-                    : (constraints.maxHeight - 32.0).clamp(580.0, constraints.maxHeight);
+                    : (constraints.maxHeight - 32.0).clamp(
+                        580.0,
+                        constraints.maxHeight,
+                      );
 
                 return Container(
                   decoration: const BoxDecoration(
@@ -108,10 +126,10 @@ class LifeRPGApp extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(32),
                         child: MediaQuery(
-                          data: MediaQuery.of(context).copyWith(
-                            size: Size(mobileWidth, targetHeight),
-                          ),
-                          child: child ?? const SizedBox(),
+                          data: MediaQuery.of(
+                            context,
+                          ).copyWith(size: Size(mobileWidth, targetHeight)),
+                          child: appContent,
                         ),
                       ),
                     ),
@@ -120,7 +138,7 @@ class LifeRPGApp extends StatelessWidget {
               }
 
               // Trên điện thoại thật hiển thị toàn màn hình tự nhiên
-              return child ?? const SizedBox();
+              return appContent;
             },
           );
         },
@@ -129,9 +147,7 @@ class LifeRPGApp extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Scaffold(
-                body: Center(
-                  child: CircularProgressIndicator(),
-                ),
+                body: Center(child: CircularProgressIndicator()),
               );
             }
             if (snapshot.hasError || !snapshot.hasData) {

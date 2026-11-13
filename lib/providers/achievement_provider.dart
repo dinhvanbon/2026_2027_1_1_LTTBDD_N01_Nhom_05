@@ -9,15 +9,21 @@ class AchievementProvider extends ChangeNotifier {
   final AchievementService _achievementService = AchievementService();
 
   StreamSubscription<List<AchievementModel>>? _achievementSubscription;
+  String? _listeningChildId;
+  bool _initialized = false;
 
   List<AchievementModel> _achievements = [];
 
   List<AchievementModel> get achievements => _achievements;
 
-  Future<void> initAchievements() async {
+  Future<void> initAchievements({bool force = false}) async {
+    if (!force && _initialized && _achievementSubscription != null) return;
+    _initialized = true;
+
     await _achievementService.seedDefaultAchievementsIfNeeded();
 
     _achievementSubscription?.cancel();
+    _listeningChildId = null;
 
     _achievementSubscription =
         _achievementService.getAchievementsStream().listen((achievements) {
@@ -25,40 +31,48 @@ class AchievementProvider extends ChangeNotifier {
       notifyListeners();
     });
   }
-  void listenAchievementsForChild(String childId) {
-  _achievementSubscription?.cancel();
 
-  _achievementSubscription = _achievementService
-      .getAchievementsStreamForChild(childId)
-      .listen((achievements) {
-    _achievements = achievements;
-    notifyListeners();
-  });
-}
-
-  Future<List<String>> checkAchievements({
-  required String childId,
-  required int level,
-}) async {
-  final List<String> unlockedAchievements = [];
-
-  final achievements =
-      await _achievementService.getAchievementsForChild(childId);
-
-  for (final achievement in achievements) {
-    if (level >= achievement.requiredLevel &&
-        achievement.unlocked == false) {
-      await _achievementService.unlockAchievementForChild(
-        childId: childId,
-        achievementId: achievement.id,
-      );
-
-      unlockedAchievements.add(achievement.title);
+  void listenAchievementsForChild(String childId, {bool force = false}) {
+    if (!force &&
+        _achievementSubscription != null &&
+        _listeningChildId == childId) {
+      return;
     }
+
+    _achievementSubscription?.cancel();
+    _listeningChildId = childId;
+
+    _achievementSubscription = _achievementService
+        .getAchievementsStreamForChild(childId)
+        .listen((achievements) {
+      _achievements = achievements;
+      notifyListeners();
+    });
   }
 
-  return unlockedAchievements;
-}
+  Future<List<String>> checkAchievements({
+    required String childId,
+    required int level,
+  }) async {
+    final List<String> unlockedAchievements = [];
+
+    final achievements =
+        await _achievementService.getAchievementsForChild(childId);
+
+    for (final achievement in achievements) {
+      if (level >= achievement.requiredLevel &&
+          achievement.unlocked == false) {
+        await _achievementService.unlockAchievementForChild(
+          childId: childId,
+          achievementId: achievement.id,
+        );
+
+        unlockedAchievements.add(achievement.title);
+      }
+    }
+
+    return unlockedAchievements;
+  }
 
   @override
   void dispose() {

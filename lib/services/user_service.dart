@@ -216,6 +216,42 @@ class UserService {
         });
   }
 
+  Future<void> createQuickChild({required String name}) async {
+    final parent = _auth.currentUser;
+
+    if (parent == null) {
+      throw Exception(tr('Parent chưa đăng nhập', 'Parent is not logged in'));
+    }
+
+    final cleanName = name.trim().isEmpty ? 'Bé Yêu' : name.trim();
+    final childRef = _firestore.collection('children').doc();
+    final linkCode = generateLinkCode();
+
+    await childRef.set({
+      'uid': childRef.id,
+      'email': '${childRef.id.substring(0, 6).toLowerCase()}@kidquest.app',
+      'username': cleanName,
+      'phone': '',
+      'level': 1,
+      'exp': 0,
+      'coins': 0,
+      'parentId': parent.uid,
+      'linkCode': linkCode,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    await _firestore
+        .collection('parents')
+        .doc(parent.uid)
+        .collection('children')
+        .doc(childRef.id)
+        .set({
+          'childId': childRef.id,
+          'linkedAt': FieldValue.serverTimestamp(),
+        });
+  }
+
   Future<void> unlinkChild(String childId) async {
     final parent = _auth.currentUser;
 

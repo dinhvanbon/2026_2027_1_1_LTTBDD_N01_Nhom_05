@@ -10,6 +10,7 @@ class RewardProvider extends ChangeNotifier {
 
   StreamSubscription<List<RewardModel>>? _rewardSubscription;
   StreamSubscription<int>? _coinsSubscription;
+  String? _listeningChildId;
 
   int coins = 0;
 
@@ -30,6 +31,7 @@ class RewardProvider extends ChangeNotifier {
     await _rewardService.seedDefaultRewardsIfNeeded();
 
     _rewardSubscription?.cancel();
+    _listeningChildId = null;
 
     _rewardSubscription = _rewardService.getRewardsStream().listen((rewards) {
       _rewards = rewards;
@@ -44,9 +46,16 @@ class RewardProvider extends ChangeNotifier {
     });
   }
 
-  void listenRewardsForChild(String childId) {
+  void listenRewardsForChild(String childId, {bool force = false}) {
+    if (!force &&
+        _rewardSubscription != null &&
+        _listeningChildId == childId) {
+      return;
+    }
+
     _rewardSubscription?.cancel();
     _coinsSubscription?.cancel();
+    _listeningChildId = childId;
 
     _rewardSubscription = _rewardService
         .getRewardsStreamForChild(childId)

@@ -10,22 +10,30 @@ class FamilyProvider extends ChangeNotifier {
 
   List<Map<String, dynamic>> _children = [];
   StreamSubscription<List<Map<String, dynamic>>>? _childrenSubscription;
+  String? _listeningUid;
 
   List<Map<String, dynamic>> get children => List.unmodifiable(_children);
 
   bool get hasChildren => _children.isNotEmpty;
 
-  void listenToLinkedChildren() {
-    _childrenSubscription?.cancel();
-
+  void listenToLinkedChildren({bool force = false}) {
     final user = FirebaseAuth.instance.currentUser;
 
     if (user == null) {
       debugPrint('FamilyProvider listen skipped: user null');
+      _childrenSubscription?.cancel();
       _childrenSubscription = null;
+      _listeningUid = null;
       _children = [];
       return;
     }
+
+    if (!force && _childrenSubscription != null && _listeningUid == user.uid) {
+      return;
+    }
+
+    _childrenSubscription?.cancel();
+    _listeningUid = user.uid;
 
     try {
       _childrenSubscription = _userService.getLinkedChildrenStream().listen(
@@ -42,28 +50,35 @@ class FamilyProvider extends ChangeNotifier {
     } catch (error) {
       debugPrint('FamilyProvider listen sync error: $error');
       _childrenSubscription = null;
+      _listeningUid = null;
       _children = [];
     }
   }
 
   Future<void> linkChild(String childId) async {
     await _userService.linkChildToParent(childId);
-    listenToLinkedChildren();
+    listenToLinkedChildren(force: true);
   }
 
   Future<void> linkChildByCode(String code) async {
     await _userService.linkChildByCode(code);
-    listenToLinkedChildren();
+    listenToLinkedChildren(force: true);
+  }
+
+  Future<void> createQuickChild(String name) async {
+    await _userService.createQuickChild(name: name);
+    listenToLinkedChildren(force: true);
   }
 
   Future<void> unlinkChild(String childId) async {
     await _userService.unlinkChild(childId);
-    listenToLinkedChildren();
+    listenToLinkedChildren(force: true);
   }
 
   void clear() {
     _childrenSubscription?.cancel();
     _childrenSubscription = null;
+    _listeningUid = null;
     _children = [];
     notifyListeners();
   }
