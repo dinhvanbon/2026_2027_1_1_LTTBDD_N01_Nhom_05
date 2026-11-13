@@ -11,6 +11,7 @@ import '../../providers/task_provider.dart';
 
 import '../shared/activity_log_screen.dart';
 import '../shared/leaderboard_screen.dart';
+import '../shared/settings_screen.dart';
 
 import 'create_task_screen.dart';
 import 'parent_reward_management_screen.dart';
@@ -123,13 +124,29 @@ class ParentDashboardScreen extends StatelessWidget {
                       totalExp: totalExp,
                       totalCoins: totalCoins,
                     ),
-                    _sectionTitle(tr('Truy cập nhanh', 'Quick access'), tr('Tất cả công cụ', 'All tools')),
+                    _sectionTitle(
+                      tr('Truy cập nhanh', 'Quick access'),
+                      tr('Tất cả công cụ', 'All tools'),
+                      () => _open(context, const SettingsScreen()),
+                    ),
                     _quickGrid(context),
-                    _sectionTitle(tr('Cần xử lý ngay', 'Needs action'), tr('Xem tất cả', 'View all')),
+                    _sectionTitle(
+                      tr('Cần xử lý ngay', 'Needs action'),
+                      tr('Xem tất cả', 'View all'),
+                      () => _open(context, const VerifyTaskScreen()),
+                    ),
                     _pendingAlerts(context, submittedTasks),
-                    _sectionTitle(tr('Tiến độ của bé', 'Child progress'), tr('Chi tiết', 'Details')),
+                    _sectionTitle(
+                      tr('Tiến độ của bé', 'Child progress'),
+                      tr('Chi tiết', 'Details'),
+                      () => _open(context, const ManageChildScreen()),
+                    ),
                     _childrenProgress(children),
-                    _sectionTitle(tr('Hoạt động gần đây', 'Recent activity'), tr('Hôm nay', 'Today')),
+                    _sectionTitle(
+                      tr('Hoạt động gần đây', 'Recent activity'),
+                      tr('Hôm nay', 'Today'),
+                      () => _open(context, const ActivityLogScreen()),
+                    ),
                     _recentActivities(tasks),
                   ],
                 ),
@@ -477,7 +494,11 @@ class ParentDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _sectionTitle(String title, String actionText) {
+  Widget _sectionTitle(
+    String title,
+    String actionText, [
+    VoidCallback? onActionTap,
+  ]) {
     return Padding(
       padding: const EdgeInsets.only(top: 22, bottom: 12),
       child: Row(
@@ -491,12 +512,19 @@ class ParentDashboardScreen extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            actionText,
-            style: const TextStyle(
-              color: Color(0xff7048ff),
-              fontSize: 13,
-              fontWeight: FontWeight.w900,
+          InkWell(
+            onTap: onActionTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              child: Text(
+                actionText,
+                style: const TextStyle(
+                  color: Color(0xff7048ff),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
             ),
           ),
         ],

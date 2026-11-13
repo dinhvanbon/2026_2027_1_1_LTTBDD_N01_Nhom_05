@@ -116,59 +116,144 @@ class ParentProfileScreen extends StatelessWidget {
 
   void showAddChildDialog(BuildContext context) {
     final linkCodeController = TextEditingController();
+    final quickNameController = TextEditingController(text: 'Bé Bi');
 
     showDialog(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text(tr('Thêm liên kết với Bé', 'Link a child')),
-          content: TextField(
-            controller: linkCodeController,
-            textCapitalization: TextCapitalization.characters,
-            decoration: InputDecoration(
-              labelText: tr('Mã liên kết', 'Link code'),
-              hintText: tr('Nhập mã liên kết của bé, ví dụ KQFPX5UF', 'Enter the child link code, e.g. KQFPX5UF'),
+          title: Text(tr('Thêm liên kết với Bé', 'Add or Link a Child')),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  tr(
+                    'Cách 1: Tạo nhanh hồ sơ Bé',
+                    'Option 1: Quick Create Child Profile',
+                  ),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: quickNameController,
+                  decoration: InputDecoration(
+                    labelText: tr('Tên của bé', 'Child name'),
+                    hintText: tr('Ví dụ: Bé Bi, Bé Bông...', 'e.g. Little Hero'),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      final name = quickNameController.text.trim();
+                      try {
+                        await context.read<FamilyProvider>().createQuickChild(
+                          name,
+                        );
+                        if (!context.mounted || !dialogContext.mounted) return;
+                        Navigator.pop(dialogContext);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              tr(
+                                'Đã tạo hồ sơ bé "$name" thành công!',
+                                'Child profile "$name" created successfully!',
+                              ),
+                            ),
+                          ),
+                        );
+                      } catch (e) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(tr('Lỗi: $e', 'Error: $e'))),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.person_add_alt_1),
+                    label: Text(tr('Tạo nhanh hồ sơ Bé', 'Quick Create Child')),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  child: Divider(),
+                ),
+                Text(
+                  tr(
+                    'Cách 2: Nhập mã liên kết từ tài khoản Child',
+                    'Option 2: Enter link code from Child account',
+                  ),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: linkCodeController,
+                  textCapitalization: TextCapitalization.characters,
+                  decoration: InputDecoration(
+                    labelText: tr('Mã liên kết', 'Link code'),
+                    hintText: tr(
+                      'Ví dụ: KQFPX5UF',
+                      'Enter link code, e.g. KQFPX5UF',
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final linkCode = linkCodeController.text.trim();
+                      if (linkCode.isEmpty) return;
+                      try {
+                        await context.read<FamilyProvider>().linkChildByCode(
+                          linkCode,
+                        );
+                        if (!context.mounted || !dialogContext.mounted) return;
+                        Navigator.pop(dialogContext);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              tr(
+                                'Liên kết Child thành công',
+                                'Child linked successfully',
+                              ),
+                            ),
+                          ),
+                        );
+                      } catch (e) {
+                        if (!context.mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(tr('Lỗi: $e', 'Error: $e'))),
+                        );
+                      }
+                    },
+                    icon: const Icon(Icons.link),
+                    label: Text(tr('Liên kết bằng mã', 'Link by code')),
+                  ),
+                ),
+              ],
             ),
           ),
-
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
               },
-              child: Text(tr('Hủy', 'Cancel')),
-            ),
-
-            FilledButton(
-              onPressed: () async {
-                final linkCode = linkCodeController.text.trim();
-
-                if (linkCode.isEmpty) {
-                  return;
-                }
-
-                try {
-                  await context.read<FamilyProvider>().linkChildByCode(
-                    linkCode,
-                  );
-
-                  if (!context.mounted) return;
-
-                  Navigator.pop(dialogContext);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(tr('Liên kết Child thành công', 'Child linked successfully'))),
-                  );
-                } catch (e) {
-                  if (!context.mounted) return;
-
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(tr('Lỗi: $e', 'Error: $e'))));
-                }
-              },
-
-              child: Text(tr('Liên kết', 'Link')),
+              child: Text(tr('Đóng', 'Close')),
             ),
           ],
         );
@@ -202,62 +287,72 @@ class ParentProfileScreen extends StatelessWidget {
     required String icon,
     required String title,
     required String subtitle,
+    VoidCallback? onTap,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      child: Material(
         color: Colors.white,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: const Color(0xfff0e7fb)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.deepPurple.withValues(alpha: 0.08),
-            blurRadius: 22,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 46,
-            height: 46,
-            alignment: Alignment.center,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(26),
+          child: Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xfff1e9ff),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(icon, style: const TextStyle(fontSize: 22)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+              borderRadius: BorderRadius.circular(26),
+              border: Border.all(color: const Color(0xfff0e7fb)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.deepPurple.withValues(alpha: 0.08),
+                  blurRadius: 22,
+                  offset: const Offset(0, 8),
                 ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: Color(0xff8b7c99),
-                    fontSize: 12,
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0xfff1e9ff),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(icon, style: const TextStyle(fontSize: 22)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(
+                          color: Color(0xff8b7c99),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Text(
+                  '›',
+                  style: TextStyle(
+                    color: Color(0xffaaa0b5),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
           ),
-          const Text(
-            '›',
-            style: TextStyle(
-              color: Color(0xffaaa0b5),
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -390,7 +485,7 @@ class ParentProfileScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      topButton('←', () => Navigator.pop(context)),
+                      topButton('←', () => Navigator.maybePop(context)),
                       Column(
                         children: [
                           Text(
@@ -492,7 +587,35 @@ class ParentProfileScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  sectionTitle(tr('Thông tin tài khoản', 'Account information'), action: tr('Sửa', 'Edit')),
+                  sectionTitle(
+                    tr('Thông tin tài khoản', 'Account information'),
+                    action: tr('Sửa', 'Edit'),
+                    onActionTap: () async {
+                      final updated = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EditProfileScreen(
+                            username: username,
+                            phone: phone,
+                            role: 'parent',
+                            accentColorHex: 'purple',
+                          ),
+                        ),
+                      );
+                      if (updated == true && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              tr(
+                                'Cập nhật thông tin thành công',
+                                'Profile updated successfully',
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -542,12 +665,44 @@ class ParentProfileScreen extends StatelessWidget {
                   settingCard(
                     icon: '🔔',
                     title: tr('Thông báo', 'Notifications'),
-                    subtitle: tr('Nhận thông báo khi con hoàn thành nhiệm vụ', 'Get notified when your child completes a quest'),
+                    subtitle: context.watch<LanguageProvider>().notificationsEnabled
+                        ? tr(
+                            'Đang bật • Nhấn để tắt thông báo',
+                            'ON • Tap to disable notifications',
+                          )
+                        : tr(
+                            'Đang tắt • Nhấn để bật thông báo',
+                            'OFF • Tap to enable notifications',
+                          ),
+                    onTap: () {
+                      final lang = context.read<LanguageProvider>();
+                      lang.toggleNotifications();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            lang.notificationsEnabled
+                                ? tr(
+                                    'Đã bật thông báo nhiệm vụ',
+                                    'Quest notifications enabled',
+                                  )
+                                : tr(
+                                    'Đã tắt thông báo nhiệm vụ',
+                                    'Quest notifications disabled',
+                                  ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   settingCard(
-                    icon: '🌙',
-                    title: tr('Chế độ tối (Dark Mode)', 'Dark Mode'),
-                    subtitle: tr('Tùy chỉnh giao diện hiển thị', 'Customize the display theme'),
+                    icon: '🌐',
+                    title: tr('Ngôn ngữ (Language)', 'Language (Ngôn ngữ)'),
+                    subtitle: context.watch<LanguageProvider>().isEnglish
+                        ? 'English • Tap to switch to Tiếng Việt'
+                        : 'Tiếng Việt • Nhấn để chuyển sang English',
+                    onTap: () {
+                      context.read<LanguageProvider>().toggleLanguage();
+                    },
                   ),
                   FilledButton(
                     onPressed: () async {

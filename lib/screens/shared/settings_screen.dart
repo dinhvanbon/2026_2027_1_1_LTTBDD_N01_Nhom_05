@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/language_provider.dart';
+import '../../services/activity_service.dart';
 import '../../services/auth_service.dart';
 import '../auth/login_screen.dart';
+import '../parent/manage_child_screen.dart';
+import '../parent/parent_reward_management_screen.dart';
+import 'achievement_screen.dart';
+import 'activity_log_screen.dart';
 import 'group_info_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -112,6 +117,9 @@ class SettingsScreen extends StatelessWidget {
                 'Quản lý tên, email và hồ sơ người dùng',
                 'Manage user name, email and profile',
               ),
+              onTap: () {
+                Navigator.maybePop(context);
+              },
             ),
             buildSettingItem(
               icon: Icons.family_restroom,
@@ -120,6 +128,12 @@ class SettingsScreen extends StatelessWidget {
                 'Quản lý phụ huynh và trẻ em trong hệ thống',
                 'Manage parents and children in the system',
               ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ManageChildScreen()),
+                );
+              },
             ),
 
             buildSectionTitle(lang.tr('Ứng dụng', 'Application')),
@@ -130,16 +144,25 @@ class SettingsScreen extends StatelessWidget {
                 'Nhắc nhiệm vụ, xác nhận và phần thưởng',
                 'Task reminders, verifications and rewards',
               ),
-              value: true,
-            ),
-            buildSwitchItem(
-              icon: Icons.dark_mode,
-              title: lang.tr('Chế độ tối', 'Dark Mode'),
-              subtitle: lang.tr(
-                'Bật giao diện tối cho ứng dụng',
-                'Enable dark theme for the app',
-              ),
-              value: false,
+              value: lang.notificationsEnabled,
+              onChanged: (val) {
+                lang.toggleNotifications(val);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      val
+                          ? lang.tr(
+                              'Đã bật thông báo ứng dụng',
+                              'Notifications enabled',
+                            )
+                          : lang.tr(
+                              'Đã tắt thông báo ứng dụng',
+                              'Notifications disabled',
+                            ),
+                    ),
+                  ),
+                );
+              },
             ),
             buildSettingItem(
               icon: Icons.language,
@@ -158,6 +181,32 @@ class SettingsScreen extends StatelessWidget {
                 'Thiết lập điểm kinh nghiệm và cấp độ',
                 'Configure experience points and levels',
               ),
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: Text(
+                      lang.tr('Quy tắc EXP & Level', 'EXP & Level Rules'),
+                    ),
+                    content: Text(
+                      lang.tr(
+                        '• Mỗi nhiệm vụ hoàn thành được phụ huynh duyệt sẽ cộng EXP tương ứng (10 - 100 EXP).\n'
+                            '• Công thức lên cấp: Level N cần N × 100 EXP.\n'
+                            '• Khi đủ EXP, hệ thống tự động tăng Level và mở khóa huy hiệu.',
+                        '• Each approved quest grants its configured EXP (10 - 100 EXP).\n'
+                            '• Level formula: Level N requires N × 100 EXP.\n'
+                            '• Reaching required EXP automatically levels up and unlocks badges.',
+                      ),
+                    ),
+                    actions: [
+                      FilledButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text(lang.tr('Đã hiểu', 'Got it')),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
             buildSettingItem(
               icon: Icons.card_giftcard,
@@ -166,6 +215,14 @@ class SettingsScreen extends StatelessWidget {
                 'Thiết lập coin, thưởng và đổi quà',
                 'Configure coins, bonuses and gift redemption',
               ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ParentRewardManagementScreen(),
+                  ),
+                );
+              },
             ),
             buildSettingItem(
               icon: Icons.emoji_events,
@@ -174,6 +231,12 @@ class SettingsScreen extends StatelessWidget {
                 'Quản lý điều kiện mở khóa thành tựu',
                 'Manage achievement unlock conditions',
               ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const AchievementScreen()),
+                );
+              },
             ),
 
             buildSectionTitle(lang.tr('Dữ liệu', 'Data')),
@@ -184,6 +247,20 @@ class SettingsScreen extends StatelessWidget {
                 'Kết nối Firebase / Cloud Firestore thời gian thực',
                 'Realtime Firebase / Cloud Firestore sync',
               ),
+              onTap: () async {
+                await ActivityService().syncOldTasksToActivity();
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      lang.tr(
+                        'Đã đồng bộ dữ liệu Cloud Firestore thành công!',
+                        'Cloud Firestore data synchronized successfully!',
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
             buildSettingItem(
               icon: Icons.backup,
@@ -192,6 +269,12 @@ class SettingsScreen extends StatelessWidget {
                 'Sao lưu dữ liệu nhiệm vụ và lịch sử',
                 'Backup tasks and activity history',
               ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ActivityLogScreen()),
+                );
+              },
             ),
 
             buildSectionTitle(lang.tr('Khác', 'Others')),

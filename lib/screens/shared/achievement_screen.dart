@@ -235,7 +235,7 @@ class AchievementScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _topButton('←', () => Navigator.pop(context)),
+                        _topButton('←', () => Navigator.maybePop(context)),
                         Column(
                           children: [
                             Text(

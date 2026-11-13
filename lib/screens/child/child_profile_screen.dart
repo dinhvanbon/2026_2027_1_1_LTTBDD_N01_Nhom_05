@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../providers/task_provider.dart';
 import '../../providers/reward_provider.dart';
 import '../../providers/achievement_provider.dart';
+import '../shared/achievement_screen.dart';
 import '../shared/settings_screen.dart';
 import '../shared/edit_profile_screen.dart';
 import '../../services/user_service.dart';
@@ -81,7 +82,11 @@ class ChildProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget sectionTitle(String title, {String? action}) {
+  Widget sectionTitle(
+    String title, {
+    String? action,
+    VoidCallback? onActionTap,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(top: 22, bottom: 12),
       child: Row(
@@ -96,12 +101,19 @@ class ChildProfileScreen extends StatelessWidget {
             ),
           ),
           if (action != null)
-            Text(
-              action,
-              style: const TextStyle(
-                color: Color(0xffff8a00),
-                fontSize: 13,
-                fontWeight: FontWeight.w800,
+            InkWell(
+              onTap: onActionTap,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                child: Text(
+                  action,
+                  style: const TextStyle(
+                    color: Color(0xffff8a00),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
               ),
             ),
         ],
@@ -220,62 +232,72 @@ class ChildProfileScreen extends StatelessWidget {
     required String icon,
     required String title,
     required String subtitle,
+    VoidCallback? onTap,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      child: Material(
         color: Colors.white,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: const Color(0xfff4e6d2)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.orange.withValues(alpha: 0.08),
-            blurRadius: 22,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 46,
-            height: 46,
-            alignment: Alignment.center,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(26),
+          child: Container(
+            padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xfffff0cf),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(icon, style: const TextStyle(fontSize: 22)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+              borderRadius: BorderRadius.circular(26),
+              border: Border.all(color: const Color(0xfff4e6d2)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.orange.withValues(alpha: 0.08),
+                  blurRadius: 22,
+                  offset: const Offset(0, 8),
                 ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: Color(0xff8b7c99),
-                    fontSize: 12,
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0xfffff0cf),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(icon, style: const TextStyle(fontSize: 22)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        subtitle,
+                        style: const TextStyle(
+                          color: Color(0xff8b7c99),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Text(
+                  '›',
+                  style: TextStyle(
+                    color: Color(0xffaaa0b5),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],
             ),
           ),
-          const Text(
-            '›',
-            style: TextStyle(
-              color: Color(0xffaaa0b5),
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -340,7 +362,7 @@ class ChildProfileScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      topButton('←', () => Navigator.pop(context)),
+                      topButton('←', () => Navigator.maybePop(context)),
                       Column(
                         children: [
                           Text(
@@ -493,7 +515,18 @@ class ChildProfileScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  sectionTitle(tr('Thành tựu nổi bật', 'Featured achievements'), action: tr('Xem tất cả', 'View all')),
+                  sectionTitle(
+                    tr('Thành tựu nổi bật', 'Featured achievements'),
+                    action: tr('Xem tất cả', 'View all'),
+                    onActionTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const AchievementScreen(),
+                        ),
+                      );
+                    },
+                  ),
                   achievementCard(
                     icon: '📚',
                     title: tr('Hiệp sĩ học tập', 'Study Knight'),
@@ -534,12 +567,67 @@ class ChildProfileScreen extends StatelessWidget {
                   settingCard(
                     icon: '🔔',
                     title: tr('Nhắc nhở nhiệm vụ', 'Quest reminders'),
-                    subtitle: tr('Nhắc nhở nhiệm vụ hằng ngày', 'Daily quest reminders'),
+                    subtitle: context.watch<LanguageProvider>().notificationsEnabled
+                        ? tr(
+                            'Đang bật • Nhấn để tắt nhắc nhở hằng ngày',
+                            'ON • Tap to disable daily reminders',
+                          )
+                        : tr(
+                            'Đang tắt • Nhấn để bật nhắc nhở hằng ngày',
+                            'OFF • Tap to enable daily reminders',
+                          ),
+                    onTap: () {
+                      final lang = context.read<LanguageProvider>();
+                      lang.toggleNotifications();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            lang.notificationsEnabled
+                                ? tr(
+                                    'Đã bật nhắc nhở nhiệm vụ hằng ngày',
+                                    'Daily quest reminders enabled',
+                                  )
+                                : tr(
+                                    'Đã tắt nhắc nhở nhiệm vụ hằng ngày',
+                                    'Daily quest reminders disabled',
+                                  ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                   settingCard(
                     icon: '🎨',
                     title: tr('Hình đại diện & Nhân vật', 'Avatar & Character'),
-                    subtitle: tr('Đổi nhân vật và giao diện', 'Change character and theme'),
+                    subtitle: tr(
+                      'Đổi nhân vật và giao diện',
+                      'Change character and theme',
+                    ),
+                    onTap: () async {
+                      final updated = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EditProfileScreen(
+                            username: username,
+                            phone: phone,
+                            role: 'child',
+                            accentColorHex: 'orange',
+                          ),
+                        ),
+                      );
+                      if (updated == true && context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              tr(
+                                'Cập nhật thông tin thành công',
+                                'Profile updated successfully',
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
                   ),
                   FilledButton(
                     onPressed: () async {

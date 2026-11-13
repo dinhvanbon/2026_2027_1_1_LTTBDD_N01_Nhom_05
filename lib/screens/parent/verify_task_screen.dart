@@ -210,7 +210,7 @@ class VerifyTaskScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  topButton('←', () => Navigator.pop(context)),
+                  topButton('←', () => Navigator.maybePop(context)),
                   Column(
                     children: [
                       Text(

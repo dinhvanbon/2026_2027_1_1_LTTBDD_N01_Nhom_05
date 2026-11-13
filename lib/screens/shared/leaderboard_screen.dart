@@ -137,7 +137,7 @@ class LeaderboardScreen extends StatelessWidget {
     return Row(
       children: [
         InkWell(
-          onTap: () => Navigator.pop(context),
+          onTap: () => Navigator.maybePop(context),
           borderRadius: BorderRadius.circular(16),
           child: Container(
             width: 44,

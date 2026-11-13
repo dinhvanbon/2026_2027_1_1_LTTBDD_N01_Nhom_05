@@ -374,7 +374,7 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
                   children: [
                     Row(
                       children: [
-                        topButton('←', () => Navigator.pop(context)),
+                        topButton('←', () => Navigator.maybePop(context)),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Column(

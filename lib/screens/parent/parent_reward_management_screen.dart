@@ -506,7 +506,7 @@ class _ParentRewardManagementScreenState
             children: [
               Row(
                 children: [
-                  _topButton('←', () => Navigator.pop(context)),
+                  _topButton('←', () => Navigator.maybePop(context)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(

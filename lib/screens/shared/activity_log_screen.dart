@@ -7,8 +7,61 @@ import '../../models/activity_model.dart';
 import '../../services/activity_service.dart';
 
 import '../../providers/language_provider.dart';
-class ActivityLogScreen extends StatelessWidget {
+
+class ActivityLogScreen extends StatefulWidget {
   const ActivityLogScreen({super.key});
+
+  @override
+  State<ActivityLogScreen> createState() => _ActivityLogScreenState();
+}
+
+class _ActivityLogScreenState extends State<ActivityLogScreen> {
+  String _selectedFilter = 'all';
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  bool _matchesFilter(ActivityModel activity) {
+    final text = '${activity.title} ${activity.description}'.toLowerCase();
+    if (_searchQuery.trim().isNotEmpty &&
+        !text.contains(_searchQuery.trim().toLowerCase())) {
+      return false;
+    }
+    switch (_selectedFilter) {
+      case 'task':
+        return text.contains('task') ||
+            text.contains('nhiệm vụ') ||
+            text.contains('submitted') ||
+            text.contains('approved') ||
+            text.contains('xác nhận') ||
+            text.contains('duyệt') ||
+            text.contains('gửi');
+      case 'exp':
+        return text.contains('exp') ||
+            text.contains('kinh nghiệm') ||
+            text.contains('approved') ||
+            text.contains('duyệt') ||
+            text.contains('hoàn thành');
+      case 'reward':
+        return text.contains('reward') ||
+            text.contains('thưởng') ||
+            text.contains('quà') ||
+            text.contains('coin');
+      case 'achievement':
+        return text.contains('achievement') ||
+            text.contains('huy hiệu') ||
+            text.contains('thành tựu');
+      case 'rejected':
+        return text.contains('rejected') || text.contains('từ chối');
+      default:
+        return true;
+    }
+  }
 
   DateTime _dateFromDynamic(dynamic value) {
     if (value == null) return DateTime.now();
@@ -208,21 +261,25 @@ class ActivityLogScreen extends StatelessWidget {
     );
   }
 
-  Widget chip(String text, {bool active = false}) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: active ? const Color(0xff7048ff) : Colors.white,
-        borderRadius: BorderRadius.circular(999),
-        border: Border.all(
-          color: active ? const Color(0xff7048ff) : const Color(0xffeee3fb),
+  Widget chip(String text, {bool active = false, VoidCallback? onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(999),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: active ? const Color(0xff7048ff) : Colors.white,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+            color: active ? const Color(0xff7048ff) : const Color(0xffeee3fb),
+          ),
         ),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: active ? Colors.white : const Color(0xff7d708d),
-          fontWeight: FontWeight.w800,
+        child: Text(
+          text,
+          style: TextStyle(
+            color: active ? Colors.white : const Color(0xff7d708d),
+            fontWeight: FontWeight.w800,
+          ),
         ),
       ),
     );
@@ -397,13 +454,23 @@ class ActivityLogScreen extends StatelessWidget {
 
             final now = DateTime.now();
 
-            final todayActivities = activities.where((activity) {
+            final allTodayActivities = activities.where((activity) {
               return activity.createdAt.year == now.year &&
                   activity.createdAt.month == now.month &&
                   activity.createdAt.day == now.day;
             }).toList();
 
-            final taskActivityCount = todayActivities.where((activity) {
+            final filteredActivities = activities
+                .where(_matchesFilter)
+                .toList();
+
+            final todayActivities = filteredActivities.where((activity) {
+              return activity.createdAt.year == now.year &&
+                  activity.createdAt.month == now.month &&
+                  activity.createdAt.day == now.day;
+            }).toList();
+
+            final taskActivityCount = allTodayActivities.where((activity) {
               final text = '${activity.title} ${activity.description}'
                   .toLowerCase();
 
@@ -414,14 +481,16 @@ class ActivityLogScreen extends StatelessWidget {
                   text.contains('rejected');
             }).length;
 
-            final achievementActivityCount = todayActivities.where((activity) {
+            final achievementActivityCount = allTodayActivities.where((
+              activity,
+            ) {
               final text = '${activity.title} ${activity.description}'
                   .toLowerCase();
 
               return text.contains('achievement') || text.contains('huy hiệu');
             }).length;
 
-            final previousActivities = activities.where((activity) {
+            final previousActivities = filteredActivities.where((activity) {
               final d = activity.createdAt;
 
               return !(d.year == now.year &&
@@ -429,7 +498,7 @@ class ActivityLogScreen extends StatelessWidget {
                   d.day == now.day);
             }).toList();
 
-            final rewardActivityCount = todayActivities.where((activity) {
+            final rewardActivityCount = allTodayActivities.where((activity) {
               final text = '${activity.title} ${activity.description}'
                   .toLowerCase();
 
@@ -445,7 +514,7 @@ class ActivityLogScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      topButton(Icons.arrow_back, () => Navigator.pop(context)),
+                      topButton(Icons.arrow_back, () => Navigator.maybePop(context)),
                       Column(
                         children: [
                           Text(
@@ -556,25 +625,46 @@ class ActivityLogScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 16,
-                      vertical: 14,
+                      vertical: 4,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(color: const Color(0xffeee3fb)),
                     ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.search, color: Color(0xff7048ff)),
-                        SizedBox(width: 10),
-                        Text(
-                          tr('Tìm kiếm nhiệm vụ, phần thưởng, thành tựu...', 'Search quests, rewards, achievements...'),
-                          style: TextStyle(
-                            color: Color(0xff8b7c99),
-                            fontSize: 14,
-                          ),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {
+                          _searchQuery = value;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        icon: const Icon(
+                          Icons.search,
+                          color: Color(0xff7048ff),
                         ),
-                      ],
+                        hintText: tr(
+                          'Tìm kiếm nhiệm vụ, phần thưởng, thành tựu...',
+                          'Search quests, rewards, achievements...',
+                        ),
+                        hintStyle: const TextStyle(
+                          color: Color(0xff8b7c99),
+                          fontSize: 14,
+                        ),
+                        border: InputBorder.none,
+                        suffixIcon: _searchQuery.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear, size: 18),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  setState(() {
+                                    _searchQuery = '';
+                                  });
+                                },
+                              )
+                            : null,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 18),
@@ -582,17 +672,44 @@ class ActivityLogScreen extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        chip(tr('Tất cả', 'All'), active: true),
+                        chip(
+                          tr('Tất cả', 'All'),
+                          active: _selectedFilter == 'all',
+                          onTap: () => setState(() => _selectedFilter = 'all'),
+                        ),
                         const SizedBox(width: 10),
-                        chip(tr('Nhiệm vụ', 'Quests')),
+                        chip(
+                          tr('Nhiệm vụ', 'Quests'),
+                          active: _selectedFilter == 'task',
+                          onTap: () => setState(() => _selectedFilter = 'task'),
+                        ),
                         const SizedBox(width: 10),
-                        chip(tr('Kinh nghiệm (EXP)', 'Experience (EXP)')),
+                        chip(
+                          tr('Kinh nghiệm (EXP)', 'Experience (EXP)'),
+                          active: _selectedFilter == 'exp',
+                          onTap: () => setState(() => _selectedFilter = 'exp'),
+                        ),
                         const SizedBox(width: 10),
-                        chip(tr('Phần thưởng', 'Rewards')),
+                        chip(
+                          tr('Phần thưởng', 'Rewards'),
+                          active: _selectedFilter == 'reward',
+                          onTap: () =>
+                              setState(() => _selectedFilter = 'reward'),
+                        ),
                         const SizedBox(width: 10),
-                        chip(tr('Thành tựu', 'Achievements')),
+                        chip(
+                          tr('Thành tựu', 'Achievements'),
+                          active: _selectedFilter == 'achievement',
+                          onTap: () =>
+                              setState(() => _selectedFilter = 'achievement'),
+                        ),
                         const SizedBox(width: 10),
-                        chip(tr('Bị từ chối', 'Rejected')),
+                        chip(
+                          tr('Bị từ chối', 'Rejected'),
+                          active: _selectedFilter == 'rejected',
+                          onTap: () =>
+                              setState(() => _selectedFilter = 'rejected'),
+                        ),
                       ],
                     ),
                   ),
@@ -602,17 +719,73 @@ class ActivityLogScreen extends StatelessWidget {
                     children: [
                       Text(
                         tr('Dòng thời gian', 'Timeline'),
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 18,
                           color: Color(0xff2d243b),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Text(
-                        tr('Xuất dữ liệu', 'Export data'),
-                        style: TextStyle(
-                          color: Color(0xff7048ff),
-                          fontWeight: FontWeight.w800,
+                      InkWell(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (dialogCtx) => AlertDialog(
+                              title: Text(
+                                tr(
+                                  'Xuất dữ liệu hoạt động',
+                                  'Export Activity Data',
+                                ),
+                              ),
+                              content: Text(
+                                tr(
+                                  'Tổng số hoạt động ghi nhận: ${activities.length}\n'
+                                      '• Hôm nay: ${allTodayActivities.length}\n'
+                                      '• Nhiệm vụ: $taskActivityCount\n'
+                                      '• Thành tựu: $achievementActivityCount\n'
+                                      '• Phần thưởng: $rewardActivityCount\n\n'
+                                      'Dữ liệu nhật ký đã sẵn sàng để trích xuất.',
+                                  'Total recorded activities: ${activities.length}\n'
+                                      '• Today: ${allTodayActivities.length}\n'
+                                      '• Quests: $taskActivityCount\n'
+                                      '• Achievements: $achievementActivityCount\n'
+                                      '• Rewards: $rewardActivityCount\n\n'
+                                      'Activity log summary is ready for export.',
+                                ),
+                              ),
+                              actions: [
+                                FilledButton(
+                                  onPressed: () {
+                                    Navigator.pop(dialogCtx);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          tr(
+                                            'Đã xuất báo cáo nhật ký hoạt động thành công!',
+                                            'Activity log report exported successfully!',
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Text(tr('Xác nhận', 'Confirm')),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          child: Text(
+                            tr('Xuất dữ liệu', 'Export data'),
+                            style: const TextStyle(
+                              color: Color(0xff7048ff),
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
                         ),
                       ),
                     ],

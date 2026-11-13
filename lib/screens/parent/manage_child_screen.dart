@@ -162,7 +162,11 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
 
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(tr('Liên kết thành công', 'Linked successfully'))),
+                      SnackBar(
+                        content: Text(
+                          tr('Liên kết thành công', 'Linked successfully'),
+                        ),
+                      ),
                     );
                   }
                 } catch (e) {
@@ -174,6 +178,62 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
                 }
               },
               child: Text(tr('Liên kết với bé', 'Link with child')),
+            ),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: () async {
+                final nameController = TextEditingController(text: 'Bé Bi');
+                final createdName = await showDialog<String>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: Text(
+                      tr('Tạo nhanh hồ sơ Bé', 'Quick Create Child Profile'),
+                    ),
+                    content: TextField(
+                      controller: nameController,
+                      decoration: InputDecoration(
+                        labelText: tr('Tên của bé', 'Child name'),
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text(tr('Hủy', 'Cancel')),
+                      ),
+                      FilledButton(
+                        onPressed: () =>
+                            Navigator.pop(ctx, nameController.text.trim()),
+                        child: Text(tr('Tạo ngay', 'Create now')),
+                      ),
+                    ],
+                  ),
+                );
+                if (createdName == null || !context.mounted) return;
+                await context.read<FamilyProvider>().createQuickChild(
+                  createdName,
+                );
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      tr(
+                        'Đã tạo hồ sơ bé "$createdName"!',
+                        'Created child profile "$createdName"!',
+                      ),
+                    ),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.person_add_alt_1),
+              label: Text(
+                tr(
+                  'Tạo nhanh hồ sơ Bé (không cần mã)',
+                  'Quick Create Child (no code needed)',
+                ),
+              ),
             ),
           ),
         ],
@@ -205,7 +265,7 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
           ),
         ),
         InkWell(
-          onTap: () => Navigator.pop(context),
+          onTap: () => Navigator.maybePop(context),
           borderRadius: BorderRadius.circular(18),
           child: Container(
             width: 48,

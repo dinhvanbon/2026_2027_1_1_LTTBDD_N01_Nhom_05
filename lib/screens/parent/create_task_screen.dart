@@ -234,6 +234,154 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     return child['uid']?.toString() ?? tr('Bé', 'Child');
   }
 
+  void _showAddOrSelectChildDialog() {
+    final linkCodeController = TextEditingController();
+    final quickNameController = TextEditingController(text: 'Bé Bi');
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(tr('Chọn hoặc Thêm Bé', 'Select or Add Child')),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  tr(
+                    'Cách 1: Tạo nhanh hồ sơ Bé để giao việc ngay',
+                    'Option 1: Quickly create a Child profile to assign quests immediately',
+                  ),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: quickNameController,
+                  decoration: InputDecoration(
+                    labelText: tr('Tên của bé', 'Child name'),
+                    hintText: tr('Ví dụ: Bé Bi, Bé Bông...', 'e.g. Little Hero'),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    onPressed: () async {
+                      final name = quickNameController.text.trim();
+                      try {
+                        await context.read<FamilyProvider>().createQuickChild(
+                          name,
+                        );
+                        if (!mounted || !dialogContext.mounted) return;
+                        Navigator.pop(dialogContext);
+                        final children =
+                            context.read<FamilyProvider>().children;
+                        if (children.isNotEmpty) {
+                          setState(() {
+                            selectedChildId =
+                                children.first['uid']?.toString();
+                          });
+                        }
+                        _showMessage(
+                          tr(
+                            'Đã thêm bé "$name" và chọn làm người nhận!',
+                            'Added "$name" and selected as recipient!',
+                          ),
+                        );
+                      } catch (e) {
+                        if (!mounted) return;
+                        _showMessage(tr('Lỗi: $e', 'Error: $e'));
+                      }
+                    },
+                    icon: const Icon(Icons.person_add_alt_1),
+                    label: Text(
+                      tr('Tạo nhanh & Chọn bé này', 'Quick Create & Select'),
+                    ),
+                  ),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  child: Divider(),
+                ),
+                Text(
+                  tr(
+                    'Cách 2: Nhập mã liên kết từ tài khoản Child có sẵn',
+                    'Option 2: Enter link code from an existing Child account',
+                  ),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: linkCodeController,
+                  textCapitalization: TextCapitalization.characters,
+                  decoration: InputDecoration(
+                    labelText: tr('Mã liên kết', 'Link code'),
+                    hintText: tr('Ví dụ: KQFPX5UF', 'e.g. KQFPX5UF'),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final code = linkCodeController.text.trim();
+                      if (code.isEmpty) return;
+                      try {
+                        await context.read<FamilyProvider>().linkChildByCode(
+                          code,
+                        );
+                        if (!mounted || !dialogContext.mounted) return;
+                        Navigator.pop(dialogContext);
+                        final children =
+                            context.read<FamilyProvider>().children;
+                        if (children.isNotEmpty) {
+                          setState(() {
+                            selectedChildId =
+                                children.first['uid']?.toString();
+                          });
+                        }
+                        _showMessage(
+                          tr(
+                            'Liên kết Child thành công!',
+                            'Child linked successfully!',
+                          ),
+                        );
+                      } catch (e) {
+                        if (!mounted) return;
+                        _showMessage(tr('Lỗi: $e', 'Error: $e'));
+                      }
+                    },
+                    icon: const Icon(Icons.link),
+                    label: Text(tr('Liên kết bằng mã', 'Link by code')),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text(tr('Đóng', 'Close')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     context.watch<LanguageProvider>();
@@ -244,6 +392,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
         if (!mounted) return;
         context.read<FamilyProvider>().listenToLinkedChildren();
       });
+    } else if (selectedChildId == null || selectedChildId!.isEmpty) {
+      selectedChildId = familyProvider.children.first['uid']?.toString();
     }
 
     final previewTitle = titleController.text.trim().isEmpty
@@ -296,7 +446,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   ),
                 ],
               ),
-              _sectionTitle(tr('Giao cho bé', 'Assign to child'), tr('Chọn người nhận', 'Choose recipient')),
+              _sectionTitle(
+                tr('Giao cho bé', 'Assign to child'),
+                tr('Chọn / Thêm bé', 'Select / Add child'),
+                _showAddOrSelectChildDialog,
+              ),
               _childGrid(familyProvider.children),
               _sectionTitle(tr('Độ khó', 'Difficulty'), tr('Mức độ thử thách', 'Challenge level')),
               _difficultyRow(),
@@ -345,7 +499,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                     child: _actionButton(
                       text: tr('Hủy bỏ', 'Cancel'),
                       isPrimary: false,
-                      onTap: isLoading ? null : () => Navigator.pop(context),
+                      onTap: isLoading ? null : () => Navigator.maybePop(context),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -370,7 +524,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _topIconButton(Icons.arrow_back, () => Navigator.pop(context)),
+        _topIconButton(Icons.arrow_back, () => Navigator.maybePop(context)),
         Column(
           children: [
             Text(
@@ -542,7 +696,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     );
   }
 
-  Widget _sectionTitle(String title, String actionText) {
+  Widget _sectionTitle(
+    String title,
+    String actionText, [
+    VoidCallback? onActionTap,
+  ]) {
     return Padding(
       padding: const EdgeInsets.only(top: 22, bottom: 12),
       child: Row(
@@ -556,12 +714,19 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            actionText,
-            style: const TextStyle(
-              color: Color(0xff7048ff),
-              fontSize: 13,
-              fontWeight: FontWeight.w900,
+          InkWell(
+            onTap: onActionTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+              child: Text(
+                actionText,
+                style: const TextStyle(
+                  color: Color(0xff7048ff),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
             ),
           ),
         ],
@@ -571,17 +736,64 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
 
   Widget _childGrid(List<Map<String, dynamic>> children) {
     if (children.isEmpty) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xffeee3fb)),
-        ),
-        child: Text(
-          tr('Chưa có bé nào được liên kết', 'No child linked yet'),
-          style: TextStyle(color: Color(0xff8b7c99)),
+      return InkWell(
+        onTap: _showAddOrSelectChildDialog,
+        borderRadius: BorderRadius.circular(24),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xffd8c7ff), width: 1.5),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: const Color(0xfff1e9ff),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(
+                  Icons.person_add_alt_1,
+                  color: Color(0xff7048ff),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      tr(
+                        'Chưa có bé nào được liên kết',
+                        'No child linked yet',
+                      ),
+                      style: const TextStyle(
+                        color: Color(0xff2d243b),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      tr(
+                        'Nhấn vào đây để Tạo nhanh bé hoặc nhập Mã liên kết',
+                        'Tap here to quickly create a child or enter link code',
+                      ),
+                      style: const TextStyle(
+                        color: Color(0xff7048ff),
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: Color(0xff7048ff)),
+            ],
+          ),
         ),
       );
     }
