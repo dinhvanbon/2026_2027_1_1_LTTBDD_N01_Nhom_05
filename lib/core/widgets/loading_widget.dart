@@ -1,1 +1,32 @@
+import 'package:flutter/material.dart';
 
+import '../constants/app_colors.dart';
+
+/// Widget hiển thị trạng thái đang tải dữ liệu.
+class LoadingWidget extends StatelessWidget {
+  final String? message;
+
+  const LoadingWidget({super.key, this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const CircularProgressIndicator(color: AppColors.primary),
+          if (message != null) ...[
+            const SizedBox(height: 12),
+            Text(
+              message!,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
