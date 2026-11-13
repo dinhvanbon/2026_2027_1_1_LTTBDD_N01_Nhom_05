@@ -1,3 +1,4 @@
+import 'package:provider/provider.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../services/user_service.dart';
 
+import '../../providers/language_provider.dart';
 class EditProfileScreen extends StatefulWidget {
   final String username;
   final String phone;
@@ -76,14 +78,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     if (username.isEmpty) {
   ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Vui lòng nhập username')),
+    SnackBar(content: Text(tr('Vui lòng nhập username', 'Please enter a username'))),
   );
   return;
 }
 
 if (phone.isEmpty) {
   ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Vui lòng nhập số điện thoại')),
+    SnackBar(content: Text(tr('Vui lòng nhập số điện thoại', 'Please enter a phone number'))),
   );
   return;
 }
@@ -92,8 +94,8 @@ final phoneRegex = RegExp(r'^[0-9]{9,11}$');
 
 if (!phoneRegex.hasMatch(phone)) {
   ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-      content: Text('Số điện thoại phải gồm 9 đến 11 chữ số'),
+    SnackBar(
+      content: Text(tr('Số điện thoại phải gồm 9 đến 11 chữ số', 'Phone number must have 9 to 11 digits')),
     ),
   );
   return;
@@ -117,7 +119,7 @@ if (!phoneRegex.hasMatch(phone)) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi cập nhật profile: $e')),
+        SnackBar(content: Text(tr('Lỗi cập nhật profile: $e', 'Profile update error: $e'))),
       );
     } finally {
       if (mounted) {
@@ -130,12 +132,13 @@ if (!phoneRegex.hasMatch(phone)) {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: widget.role == 'child'
           ? const Color(0xfffffdf8)
           : const Color(0xfffffaff),
       appBar: AppBar(
-        title: const Text('Chỉnh sửa thông tin'),
+        title: Text(tr('Chỉnh sửa thông tin', 'Edit profile')),
         backgroundColor: accentColor,
         foregroundColor: Colors.white,
       ),
@@ -168,7 +171,7 @@ if (!phoneRegex.hasMatch(phone)) {
             ),
             const SizedBox(height: 12),
             Text(
-              'Chạm để chọn avatar',
+              tr('Chạm để chọn avatar', 'Tap to choose an avatar'),
               style: TextStyle(
                 color: accentColor,
                 fontWeight: FontWeight.bold,
@@ -197,7 +200,7 @@ if (!phoneRegex.hasMatch(phone)) {
                 minimumSize: const Size.fromHeight(56),
                 backgroundColor: accentColor,
               ),
-              child: Text(isSaving ? 'Đang lưu...' : 'Save Profile'),
+              child: Text(isSaving ? tr('Đang lưu...', 'Saving...') : 'Save Profile'),
             ),
           ],
         ),

@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../providers/language_provider.dart';
 class UserService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -24,7 +25,7 @@ class UserService {
     final user = _auth.currentUser;
 
     if (user == null) {
-      throw Exception('User chưa đăng nhập');
+      throw Exception(tr('User chưa đăng nhập', 'User is not logged in'));
     }
 
     await _firestore.collection('users').doc(user.uid).set({
@@ -42,7 +43,7 @@ class UserService {
     final user = _auth.currentUser;
 
     if (user == null) {
-      throw Exception('User chưa đăng nhập');
+      throw Exception(tr('User chưa đăng nhập', 'User is not logged in'));
     }
 
     final userRef = _firestore.collection('users').doc(user.uid);
@@ -113,7 +114,7 @@ class UserService {
     final user = _auth.currentUser;
 
     if (user == null) {
-      throw Exception('User chưa đăng nhập');
+      throw Exception(tr('User chưa đăng nhập', 'User is not logged in'));
     }
 
     final userDoc = await _firestore.collection('users').doc(user.uid).get();
@@ -151,7 +152,7 @@ class UserService {
     final parent = _auth.currentUser;
 
     if (parent == null) {
-      throw Exception('Parent chưa đăng nhập');
+      throw Exception(tr('Parent chưa đăng nhập', 'Parent is not logged in'));
     }
 
     final childRef = _firestore.collection('children').doc(childId);
@@ -159,7 +160,7 @@ class UserService {
     final childDoc = await childRef.get();
 
     if (!childDoc.exists) {
-      throw Exception('Không tìm thấy Child');
+      throw Exception(tr('Không tìm thấy Child', 'Child not found'));
     }
 
     await childRef.update({
@@ -172,13 +173,13 @@ class UserService {
     final parent = _auth.currentUser;
 
     if (parent == null) {
-      throw Exception('Parent chưa đăng nhập');
+      throw Exception(tr('Parent chưa đăng nhập', 'Parent is not logged in'));
     }
 
     final normalizedCode = code.trim().toUpperCase();
 
     if (normalizedCode.isEmpty) {
-      throw Exception('Vui lòng nhập mã liên kết');
+      throw Exception(tr('Vui lòng nhập mã liên kết', 'Please enter the link code'));
     }
 
     final snapshot = await _firestore
@@ -188,7 +189,7 @@ class UserService {
         .get();
 
     if (snapshot.docs.isEmpty) {
-      throw Exception('Không tìm thấy Child');
+      throw Exception(tr('Không tìm thấy Child', 'Child not found'));
     }
 
     final childDoc = snapshot.docs.first;
@@ -196,7 +197,7 @@ class UserService {
     final parentId = (childDoc.data()['parentId'] ?? '').toString();
 
     if (parentId.isNotEmpty) {
-      throw Exception('Child đã được liên kết');
+      throw Exception(tr('Child đã được liên kết', 'Child is already linked'));
     }
 
     await childDoc.reference.update({
@@ -219,20 +220,20 @@ class UserService {
     final parent = _auth.currentUser;
 
     if (parent == null) {
-      throw Exception('Parent chưa đăng nhập');
+      throw Exception(tr('Parent chưa đăng nhập', 'Parent is not logged in'));
     }
 
     final childRef = _firestore.collection('children').doc(childId);
     final childDoc = await childRef.get();
 
     if (!childDoc.exists) {
-      throw Exception('Không tìm thấy Child');
+      throw Exception(tr('Không tìm thấy Child', 'Child not found'));
     }
 
     final currentParentId = (childDoc.data()?['parentId'] ?? '').toString();
 
     if (currentParentId != parent.uid) {
-      throw Exception('Bạn không có quyền hủy liên kết Child này');
+      throw Exception(tr('Bạn không có quyền hủy liên kết Child này', 'You do not have permission to unlink this child'));
     }
 
     await childRef.update({
@@ -252,7 +253,7 @@ class UserService {
     final parent = _auth.currentUser;
 
     if (parent == null) {
-      throw Exception('Parent chưa đăng nhập');
+      throw Exception(tr('Parent chưa đăng nhập', 'Parent is not logged in'));
     }
 
     return _firestore
@@ -275,7 +276,7 @@ class UserService {
     final user = _auth.currentUser;
 
     if (user == null) {
-      throw Exception('User chưa đăng nhập');
+      throw Exception(tr('User chưa đăng nhập', 'User is not logged in'));
     }
 
     final userRef = _firestore.collection('users').doc(user.uid);

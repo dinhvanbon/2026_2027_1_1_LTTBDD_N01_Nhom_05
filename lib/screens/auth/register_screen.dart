@@ -134,13 +134,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _getFirebaseErrorMessage(String code) {
     switch (code) {
       case 'invalid-email':
-        return 'Email không hợp lệ / Invalid email';
+        return tr('Email không hợp lệ', 'Invalid email');
       case 'email-already-in-use':
-        return 'Email này đã được sử dụng / Email already in use';
+        return tr('Email này đã được sử dụng', 'Email already in use');
       case 'weak-password':
-        return 'Mật khẩu quá yếu / Weak password';
+        return tr('Mật khẩu quá yếu', 'Weak password');
       default:
-        return 'Đăng ký thất bại: $code';
+        return tr('Đăng ký thất bại: $code', 'Registration failed: $code');
     }
   }
 
@@ -286,6 +286,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final lang = context.watch<LanguageProvider>();
 
     return Scaffold(

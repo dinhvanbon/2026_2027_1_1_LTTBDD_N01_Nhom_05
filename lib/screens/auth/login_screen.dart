@@ -104,17 +104,17 @@ class _LoginScreenState extends State<LoginScreen> {
   String _getFirebaseErrorMessage(String code) {
     switch (code) {
       case 'invalid-email':
-        return 'Email không hợp lệ / Invalid email';
+        return tr('Email không hợp lệ', 'Invalid email');
       case 'user-not-found':
-        return 'Tài khoản không tồn tại / User not found';
+        return tr('Tài khoản không tồn tại', 'User not found');
       case 'wrong-password':
-        return 'Mật khẩu không đúng / Wrong password';
+        return tr('Mật khẩu không đúng', 'Wrong password');
       case 'invalid-credential':
-        return 'Email hoặc mật khẩu không đúng / Invalid credentials';
+        return tr('Email hoặc mật khẩu không đúng', 'Invalid email or password');
       case 'too-many-requests':
-        return 'Thử quá nhiều lần. Vui lòng thử lại sau.';
+        return tr('Thử quá nhiều lần. Vui lòng thử lại sau.', 'Too many attempts. Please try again later.');
       default:
-        return 'Đăng nhập thất bại: $code';
+        return tr('Đăng nhập thất bại: $code', 'Login failed: $code');
     }
   }
 
@@ -187,6 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final lang = context.watch<LanguageProvider>();
 
     return Scaffold(

@@ -1,3 +1,4 @@
+import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../models/activity_model.dart';
 import '../../services/activity_service.dart';
 
+import '../../providers/language_provider.dart';
 class ActivityLogScreen extends StatelessWidget {
   const ActivityLogScreen({super.key});
 
@@ -106,8 +108,8 @@ class ActivityLogScreen extends StatelessWidget {
 
       items.add(
         ActivityModel(
-          title: 'Đã đổi quà',
-          description: data['title'] ?? data['description'] ?? 'Phần thưởng',
+          title: tr('Đã đổi quà', 'Reward redeemed'),
+          description: data['title'] ?? data['description'] ?? tr('Phần thưởng', 'Rewards'),
           createdAt: _dateFromDynamic(data['redeemedAt']),
         ),
       );
@@ -117,8 +119,8 @@ class ActivityLogScreen extends StatelessWidget {
       final data = doc.data();
       items.add(
         ActivityModel(
-          title: 'Thành tựu',
-          description: data['title'] ?? data['description'] ?? 'Mở khóa thành tựu',
+          title: tr('Thành tựu', 'Achievements'),
+          description: data['title'] ?? data['description'] ?? tr('Mở khóa thành tựu', 'Achievement unlocked'),
           createdAt: _dateFromDynamic(
             data['unlockedAt'] ?? data['createdAt'] ?? data['updatedAt'],
           ),
@@ -130,8 +132,8 @@ class ActivityLogScreen extends StatelessWidget {
       final data = doc.data();
       items.add(
         ActivityModel(
-          title: 'Phần thưởng',
-          description: data['title'] ?? data['description'] ?? 'Phần thưởng mới',
+          title: tr('Phần thưởng', 'Rewards'),
+          description: data['title'] ?? data['description'] ?? tr('Phần thưởng mới', 'New reward'),
           createdAt: _dateFromDynamic(data['updatedAt'] ?? data['createdAt']),
         ),
       );
@@ -345,14 +347,14 @@ class ActivityLogScreen extends StatelessWidget {
   }
 
   String _dateText(DateTime time) {
-    const days = [
-      'Thứ Hai',
-      'Thứ Ba',
-      'Thứ Tư',
-      'Thứ Năm',
-      'Thứ Sáu',
-      'Thứ Bảy',
-      'Chủ Nhật',
+    final days = [
+      tr('Thứ Hai', 'Monday'),
+      tr('Thứ Ba', 'Tuesday'),
+      tr('Thứ Tư', 'Wednesday'),
+      tr('Thứ Năm', 'Thursday'),
+      tr('Thứ Sáu', 'Friday'),
+      tr('Thứ Bảy', 'Saturday'),
+      tr('Chủ Nhật', 'Sunday'),
     ];
 
     final day = time.day.toString().padLeft(2, '0');
@@ -384,6 +386,7 @@ class ActivityLogScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: const Color(0xfffffaff),
       body: SafeArea(
@@ -443,10 +446,10 @@ class ActivityLogScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       topButton(Icons.arrow_back, () => Navigator.pop(context)),
-                      const Column(
+                      Column(
                         children: [
                           Text(
-                            'Hoạt động',
+                            tr('Hoạt động', 'Activity'),
                             style: TextStyle(
                               fontSize: 22,
                               color: Color(0xff2d243b),
@@ -455,7 +458,7 @@ class ActivityLogScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 3),
                           Text(
-                            'Lịch sử hoạt động',
+                            tr('Lịch sử hoạt động', 'Activity history'),
                             style: TextStyle(
                               fontSize: 13,
                               color: Color(0xff8b7c99),
@@ -469,7 +472,7 @@ class ActivityLogScreen extends StatelessWidget {
                         if (!context.mounted) return;
 
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Đã đồng bộ nhiệm vụ cũ')),
+                          SnackBar(content: Text(tr('Đã đồng bộ nhiệm vụ cũ', 'Old quests synced'))),
                         );
                       }),
                     ],
@@ -504,8 +507,8 @@ class ActivityLogScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const Text(
-                          'Hoạt động hôm nay bao gồm nhiệm vụ, kinh nghiệm (EXP), phần thưởng và thành tựu.',
+                        Text(
+                          tr('Hoạt động hôm nay bao gồm nhiệm vụ, kinh nghiệm (EXP), phần thưởng và thành tựu.', 'Today activity includes quests, experience (EXP), rewards and achievements.'),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 14,
@@ -525,7 +528,7 @@ class ActivityLogScreen extends StatelessWidget {
                           child: statCard(
                             icon: Icons.assignment,
                             value: '$taskActivityCount',
-                            label: 'Nhiệm vụ',
+                            label: tr('Nhiệm vụ', 'Quests'),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -534,7 +537,7 @@ class ActivityLogScreen extends StatelessWidget {
                           child: statCard(
                             icon: Icons.star,
                             value: '$achievementActivityCount',
-                            label: 'Thành tựu',
+                            label: tr('Thành tựu', 'Achievements'),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -543,7 +546,7 @@ class ActivityLogScreen extends StatelessWidget {
                           child: statCard(
                             icon: Icons.card_giftcard,
                             value: '$rewardActivityCount',
-                            label: 'Phần thưởng',
+                            label: tr('Phần thưởng', 'Rewards'),
                           ),
                         ),
                       ],
@@ -560,12 +563,12 @@ class ActivityLogScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(color: const Color(0xffeee3fb)),
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         Icon(Icons.search, color: Color(0xff7048ff)),
                         SizedBox(width: 10),
                         Text(
-                          'Tìm kiếm nhiệm vụ, phần thưởng, thành tựu...',
+                          tr('Tìm kiếm nhiệm vụ, phần thưởng, thành tựu...', 'Search quests, rewards, achievements...'),
                           style: TextStyle(
                             color: Color(0xff8b7c99),
                             fontSize: 14,
@@ -579,26 +582,26 @@ class ActivityLogScreen extends StatelessWidget {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        chip('Tất cả', active: true),
+                        chip(tr('Tất cả', 'All'), active: true),
                         const SizedBox(width: 10),
-                        chip('Nhiệm vụ'),
+                        chip(tr('Nhiệm vụ', 'Quests')),
                         const SizedBox(width: 10),
-                        chip('Kinh nghiệm (EXP)'),
+                        chip(tr('Kinh nghiệm (EXP)', 'Experience (EXP)')),
                         const SizedBox(width: 10),
-                        chip('Phần thưởng'),
+                        chip(tr('Phần thưởng', 'Rewards')),
                         const SizedBox(width: 10),
-                        chip('Thành tựu'),
+                        chip(tr('Thành tựu', 'Achievements')),
                         const SizedBox(width: 10),
-                        chip('Bị từ chối'),
+                        chip(tr('Bị từ chối', 'Rejected')),
                       ],
                     ),
                   ),
                   const SizedBox(height: 22),
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Dòng thời gian',
+                        tr('Dòng thời gian', 'Timeline'),
                         style: TextStyle(
                           fontSize: 18,
                           color: Color(0xff2d243b),
@@ -606,7 +609,7 @@ class ActivityLogScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Xuất dữ liệu',
+                        tr('Xuất dữ liệu', 'Export data'),
                         style: TextStyle(
                           color: Color(0xff7048ff),
                           fontWeight: FontWeight.w800,
@@ -615,10 +618,10 @@ class ActivityLogScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 12),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      'HÔM NAY',
+                      tr('HÔM NAY', 'TODAY'),
                       style: TextStyle(
                         color: Color(0xff8b7c99),
                         fontSize: 13,
@@ -630,10 +633,10 @@ class ActivityLogScreen extends StatelessWidget {
                   if (todayActivities.isEmpty)
                     activityCard(
                       icon: Icons.info_outline,
-                      title: 'Chưa có hoạt động',
+                      title: tr('Chưa có hoạt động', 'No activity yet'),
                       description:
-                          'Khi nhiệm vụ được tạo, gửi, duyệt hoặc nhận thưởng, hoạt động sẽ hiển thị tại đây.',
-                      tag: 'TRỐNG',
+                          tr('Khi nhiệm vụ được tạo, gửi, duyệt hoặc nhận thưởng, hoạt động sẽ hiển thị tại đây.', 'When quests are created, submitted, approved or rewarded, activities will appear here.'),
+                      tag: tr('TRỐNG', 'EMPTY'),
                       time: '--:--',
                       amount: '',
                       iconBg: const Color(0xfff1e9ff),
@@ -648,7 +651,7 @@ class ActivityLogScreen extends StatelessWidget {
                           ),
                           title: activity.title,
                           description: activity.description,
-                          tag: 'HOẠT ĐỘNG',
+                          tag: tr('HOẠT ĐỘNG', 'ACTIVITY'),
                           time: _timeText(activity.createdAt),
                           amount: '',
                           iconBg: const Color(0xfff1e9ff),
@@ -659,10 +662,10 @@ class ActivityLogScreen extends StatelessWidget {
                   const SizedBox(height: 24),
 
                   if (previousActivities.isNotEmpty) ...[
-                    const Align(
+                    Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'CÁC NGÀY TRƯỚC',
+                        tr('CÁC NGÀY TRƯỚC', 'PREVIOUS DAYS'),
                         style: TextStyle(
                           color: Color(0xff8b7c99),
                           fontWeight: FontWeight.w900,

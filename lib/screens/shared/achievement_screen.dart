@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/achievement_provider.dart';
 
+import '../../providers/language_provider.dart';
 class AchievementScreen extends StatelessWidget {
   const AchievementScreen({super.key});
 
@@ -200,6 +201,7 @@ class AchievementScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
@@ -234,10 +236,10 @@ class AchievementScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         _topButton('←', () => Navigator.pop(context)),
-                        const Column(
+                        Column(
                           children: [
                             Text(
-                              'Thành tựu',
+                              tr('Thành tựu', 'Achievements'),
                               style: TextStyle(
                                 fontSize: 22,
                                 color: Color(0xff2d243b),
@@ -246,7 +248,7 @@ class AchievementScreen extends StatelessWidget {
                             ),
                             SizedBox(height: 3),
                             Text(
-                              'Huy hiệu & thành tựu',
+                              tr('Huy hiệu & thành tựu', 'Badges & achievements'),
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Color(0xff8b7c99),
@@ -298,7 +300,7 @@ class AchievementScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 8),
                           Text(
-                            'Bạn đã mở khóa $unlockedCount thành tựu. Tiếp tục hoàn thành nhiệm vụ để nhận thêm huy hiệu.',
+                            tr('Bạn đã mở khóa $unlockedCount thành tựu. Tiếp tục hoàn thành nhiệm vụ để nhận thêm huy hiệu.', 'You have unlocked $unlockedCount achievements. Keep completing quests to earn more badges.'),
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -341,19 +343,19 @@ class AchievementScreen extends StatelessWidget {
                         statCard(
                           icon: '🏆',
                           value: '$unlockedCount',
-                          label: 'Đã mở khóa',
+                          label: tr('Đã mở khóa', 'Unlocked'),
                         ),
                         const SizedBox(width: 12),
                         statCard(
                           icon: '🔒',
                           value: '$lockedCount',
-                          label: 'Chưa mở',
+                          label: tr('Chưa mở', 'Locked'),
                         ),
                         const SizedBox(width: 12),
                         statCard(
                           icon: '⭐',
                           value: '${unlockedCount * 50}',
-                          label: 'EXP Thưởng',
+                          label: tr('EXP Thưởng', 'Bonus EXP'),
                         ),
                       ],
                     ),
@@ -368,12 +370,12 @@ class AchievementScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(22),
                         border: Border.all(color: const Color(0xffeee3fb)),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Text('🔍', style: TextStyle(fontSize: 20)),
                           SizedBox(width: 10),
                           Text(
-                            'Tìm achievement, badge, reward...',
+                            tr('Tìm achievement, badge, reward...', 'Search achievements, badges, rewards...'),
                             style: TextStyle(
                               color: Color(0xff8b7c99),
                               fontSize: 14,
@@ -424,8 +426,8 @@ class AchievementScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     if (achievements.isEmpty)
-                      const Text(
-                        'Chưa có achievement',
+                      Text(
+                        tr('Chưa có achievement', 'No achievements yet'),
                         style: TextStyle(color: Color(0xff8b7c99)),
                       )
                     else

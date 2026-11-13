@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import '../models/reward_model.dart';
 
+import '../providers/language_provider.dart';
 class RewardService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -11,7 +12,7 @@ class RewardService {
     final user = _auth.currentUser;
 
     if (user == null) {
-      throw Exception('User chưa đăng nhập');
+      throw Exception(tr('User chưa đăng nhập', 'User is not logged in'));
     }
 
     return user.uid;
@@ -91,7 +92,7 @@ class RewardService {
       final currentCoins = (userSnapshot.data()?['coins'] ?? 0).toInt();
 
       if (currentCoins < reward.price) {
-        throw Exception('Không đủ coins để đổi thưởng');
+        throw Exception(tr('Không đủ coins để đổi thưởng', 'Not enough coins to redeem this reward'));
       }
 
       transaction.set(userRef, {

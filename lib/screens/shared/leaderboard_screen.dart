@@ -1,3 +1,4 @@
+import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -5,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../providers/language_provider.dart';
 class LeaderboardScreen extends StatelessWidget {
   const LeaderboardScreen({super.key});
 
@@ -88,6 +90,7 @@ class LeaderboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: const Color(0xfffffaff),
       body: SafeArea(
@@ -153,11 +156,11 @@ class LeaderboardScreen extends StatelessWidget {
             child: const Icon(Icons.arrow_back, color: Color(0xff2d243b)),
           ),
         ),
-        const Expanded(
+        Expanded(
           child: Column(
             children: [
               Text(
-                'Bảng xếp hạng',
+                tr('Bảng xếp hạng', 'Leaderboard'),
                 style: TextStyle(
                   color: Color(0xff2d243b),
                   fontSize: 25,
@@ -166,7 +169,7 @@ class LeaderboardScreen extends StatelessWidget {
               ),
               SizedBox(height: 4),
               Text(
-                'Xếp hạng trong gia đình',
+                tr('Xếp hạng trong gia đình', 'Family ranking'),
                 style: TextStyle(color: Color(0xff8b7c99), fontSize: 13),
               ),
             ],
@@ -223,7 +226,7 @@ class LeaderboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            'Chiến binh Cấp $level',
+            tr('Chiến binh Cấp $level', 'Level $level Warrior'),
             style: const TextStyle(color: Colors.white, fontSize: 14),
           ),
           const SizedBox(height: 10),
@@ -316,7 +319,7 @@ class LeaderboardScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(999),
             ),
             child: Text(
-              'Cấp $level',
+              tr('Cấp $level', 'Level $level'),
               style: const TextStyle(
                 color: Color(0xff7048ff),
                 fontSize: 12,
@@ -371,8 +374,8 @@ class LeaderboardScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
       ),
-      child: const Text(
-        'Chưa có bé nào được liên kết.',
+      child: Text(
+        tr('Chưa có bé nào được liên kết.', 'No child linked yet.'),
         textAlign: TextAlign.center,
         style: TextStyle(color: Color(0xff8b7c99)),
       ),

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../models/task_model.dart';
 import 'notification_service.dart';
 
+import '../providers/language_provider.dart';
 class TaskService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -21,7 +22,7 @@ class TaskService {
     final user = _auth.currentUser;
 
     if (user == null) {
-      throw Exception('User chưa đăng nhập');
+      throw Exception(tr('User chưa đăng nhập', 'User is not logged in'));
     }
 
     await _firestore.collection('tasks').add({
@@ -86,7 +87,7 @@ class TaskService {
           final taskDoc = await transaction.get(taskRef);
 
           if (!taskDoc.exists) {
-            throw Exception('Không tìm thấy task');
+            throw Exception(tr('Không tìm thấy task', 'Task not found'));
           }
 
           final taskData = taskDoc.data()!;
@@ -97,7 +98,7 @@ class TaskService {
           final int rewardAmount = (taskData['rewardAmount'] ?? 0).toInt();
 
           if (childId == null || childId.toString().isEmpty) {
-            throw Exception('Task chưa có childId');
+            throw Exception(tr('Task chưa có childId', 'Task has no childId'));
           }
 
           final childRef = _firestore.collection('children').doc(childId);
