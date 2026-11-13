@@ -7,6 +7,7 @@ import '../../models/reward_model.dart';
 import '../../providers/reward_provider.dart';
 import '../../providers/family_provider.dart';
 
+import '../../providers/language_provider.dart';
 class ParentRewardManagementScreen extends StatefulWidget {
   const ParentRewardManagementScreen({super.key});
 
@@ -38,7 +39,7 @@ class _ParentRewardManagementScreenState
       context: context,
       builder: (_) {
         return AlertDialog(
-          title: Text(reward == null ? 'Tạo reward' : 'Sửa reward'),
+          title: Text(reward == null ? tr('Tạo reward', 'Create reward') : tr('Sửa reward', 'Edit reward')),
           content: SingleChildScrollView(
             child: Column(
               children: [
@@ -48,16 +49,16 @@ class _ParentRewardManagementScreenState
                 ),
                 TextField(
                   controller: titleController,
-                  decoration: const InputDecoration(labelText: 'Tên reward'),
+                  decoration: InputDecoration(labelText: tr('Tên reward', 'Reward name')),
                 ),
                 TextField(
                   controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'Mô tả'),
+                  decoration: InputDecoration(labelText: tr('Mô tả', 'Description')),
                 ),
                 TextField(
                   controller: priceController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Giá coin'),
+                  decoration: InputDecoration(labelText: tr('Giá coin', 'Coin price')),
                 ),
               ],
             ),
@@ -65,7 +66,7 @@ class _ParentRewardManagementScreenState
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Hủy'),
+              child: Text(tr('Hủy', 'Cancel')),
             ),
             FilledButton(
               onPressed: () async {
@@ -76,21 +77,21 @@ class _ParentRewardManagementScreenState
 
                 if (title.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Vui lòng nhập tên reward')),
+                    SnackBar(content: Text(tr('Vui lòng nhập tên reward', 'Please enter the reward name'))),
                   );
                   return;
                 }
 
                 if (description.isEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Vui lòng nhập mô tả reward')),
+                    SnackBar(content: Text(tr('Vui lòng nhập mô tả reward', 'Please enter the reward description'))),
                   );
                   return;
                 }
 
                 if (price <= 0) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Giá coin phải lớn hơn 0')),
+                    SnackBar(content: Text(tr('Giá coin phải lớn hơn 0', 'Coin price must be greater than 0'))),
                   );
                   return;
                 }
@@ -126,7 +127,7 @@ class _ParentRewardManagementScreenState
                   if (context.mounted) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Đã lưu reward')),
+                      SnackBar(content: Text(tr('Đã lưu reward', 'Reward saved'))),
                     );
                   }
                 } catch (e) {
@@ -134,12 +135,12 @@ class _ParentRewardManagementScreenState
 
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Lỗi lưu reward: $e')),
+                      SnackBar(content: Text(tr('Lỗi lưu reward: $e', 'Save reward error: $e'))),
                     );
                   }
                 }
               },
-              child: const Text('Lưu'),
+              child: Text(tr('Lưu', 'Save')),
             ),
           ],
         );
@@ -320,7 +321,7 @@ class _ParentRewardManagementScreenState
 
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Đã xóa reward')),
+                    SnackBar(content: Text(tr('Đã xóa reward', 'Reward deleted'))),
                   );
                 }
               } catch (e) {
@@ -329,7 +330,7 @@ class _ParentRewardManagementScreenState
                 if (context.mounted) {
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(SnackBar(content: Text('Lỗi xóa reward: $e')));
+                  ).showSnackBar(SnackBar(content: Text(tr('Lỗi xóa reward: $e', 'Delete reward error: $e'))));
                 }
               }
             },
@@ -456,6 +457,7 @@ class _ParentRewardManagementScreenState
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final rewardProvider = context.watch<RewardProvider>();
     final rewards = rewardProvider.rewards;
 
@@ -506,11 +508,11 @@ class _ParentRewardManagementScreenState
                 children: [
                   _topButton('←', () => Navigator.pop(context)),
                   const SizedBox(width: 8),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       children: [
                         Text(
-                          'Quản lý phần thưởng',
+                          tr('Quản lý phần thưởng', 'Reward management'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -521,7 +523,7 @@ class _ParentRewardManagementScreenState
                         ),
                         SizedBox(height: 3),
                         Text(
-                          'Hệ thống phần thưởng cho bé',
+                          tr('Hệ thống phần thưởng cho bé', 'Reward system for your child'),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -571,8 +573,8 @@ class _ParentRewardManagementScreenState
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Tổng phần thưởng',
+                              Text(
+                                tr('Tổng phần thưởng', 'Total rewards'),
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 19,
@@ -602,13 +604,13 @@ class _ParentRewardManagementScreenState
                             backgroundColor: Colors.white,
                             foregroundColor: const Color(0xffff8a00),
                           ),
-                          child: const Text('Thêm phần thưởng'),
+                          child: Text(tr('Thêm phần thưởng', 'Add reward')),
                         ),
                       ],
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      'Chọn bé, tạo phần thưởng mới và chỉnh sửa quà tặng riêng cho từng bé.',
+                    Text(
+                      tr('Chọn bé, tạo phần thưởng mới và chỉnh sửa quà tặng riêng cho từng bé.', 'Choose a child, create new rewards and edit gifts for each child.'),
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -650,7 +652,7 @@ class _ParentRewardManagementScreenState
                     child: statCard(
                       icon: '🎁',
                       value: '${rewards.length}',
-                      label: 'Quà tặng',
+                      label: tr('Quà tặng', 'Gifts'),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -659,7 +661,7 @@ class _ParentRewardManagementScreenState
                       icon: '✅',
                       value:
                           '${rewards.where((reward) => reward.redeemed).length}',
-                      label: 'Đã đổi',
+                      label: tr('Đã đổi', 'Redeemed'),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -668,7 +670,7 @@ class _ParentRewardManagementScreenState
                       icon: '🟢',
                       value:
                           '${rewards.where((reward) => !reward.redeemed).length}',
-                      label: 'Có sẵn',
+                      label: tr('Có sẵn', 'Available'),
                     ),
                   ),
                 ],
@@ -696,8 +698,8 @@ class _ParentRewardManagementScreenState
               ),
               const SizedBox(height: 12),
               if (rewards.isEmpty)
-                const Text(
-                  'Chưa có reward',
+                Text(
+                  tr('Chưa có reward', 'No rewards yet'),
                   style: TextStyle(color: Color(0xff8b7c99)),
                 )
               else

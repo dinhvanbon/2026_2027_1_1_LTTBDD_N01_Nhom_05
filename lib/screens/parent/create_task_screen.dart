@@ -6,6 +6,7 @@ import '../../providers/family_provider.dart';
 import '../../services/task_service.dart';
 import 'parent_main_navigation_screen.dart';
 
+import '../../providers/language_provider.dart';
 class CreateTaskScreen extends StatefulWidget {
   const CreateTaskScreen({super.key});
 
@@ -108,52 +109,52 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     final deadlineAt = parseDeadline(deadlineController.text);
 
     if (selectedChildId == null || selectedChildId!.isEmpty) {
-      _showMessage('Vui lòng chọn Child');
+      _showMessage(tr('Vui lòng chọn Child', 'Please choose a child'));
       return;
     }
 
     if (title.isEmpty) {
-      _showMessage('Vui lòng nhập tên nhiệm vụ');
+      _showMessage(tr('Vui lòng nhập tên nhiệm vụ', 'Please enter the quest name'));
       return;
     }
 
     if (title.length > 50) {
-      _showMessage('Tên nhiệm vụ tối đa 50 ký tự');
+      _showMessage(tr('Tên nhiệm vụ tối đa 50 ký tự', 'Quest name must be at most 50 characters'));
       return;
     }
 
     if (description.isEmpty) {
-      _showMessage('Vui lòng nhập mô tả nhiệm vụ');
+      _showMessage(tr('Vui lòng nhập mô tả nhiệm vụ', 'Please enter the quest description'));
       return;
     }
 
     if (expReward <= 0) {
-      _showMessage('EXP phải lớn hơn 0');
+      _showMessage(tr('EXP phải lớn hơn 0', 'EXP must be greater than 0'));
       return;
     }
 
     if (expReward > 1000) {
-      _showMessage('EXP tối đa 1000');
+      _showMessage(tr('EXP tối đa 1000', 'EXP must be at most 1000'));
       return;
     }
 
     if (rewardAmount < 0) {
-      _showMessage('Tiền thưởng không được âm');
+      _showMessage(tr('Tiền thưởng không được âm', 'Reward cannot be negative'));
       return;
     }
 
     if (rewardAmount > 10000) {
-      _showMessage('Coin tối đa 10000');
+      _showMessage(tr('Coin tối đa 10000', 'Coins must be at most 10000'));
       return;
     }
 
     if (deadlineController.text.trim().isNotEmpty && deadlineAt == null) {
-      _showMessage('Deadline phải có dạng dd/MM/yyyy HH:mm');
+      _showMessage(tr('Deadline phải có dạng dd/MM/yyyy HH:mm', 'Deadline must be in dd/MM/yyyy HH:mm format'));
       return;
     }
 
     if (deadlineAt != null && deadlineAt.isBefore(DateTime.now())) {
-      _showMessage('Deadline không được ở quá khứ');
+      _showMessage(tr('Deadline không được ở quá khứ', 'Deadline cannot be in the past'));
       return;
     }
 
@@ -190,7 +191,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       rewardController.clear();
 
       messenger.showSnackBar(
-        const SnackBar(content: Text('Tạo nhiệm vụ thành công')),
+        SnackBar(content: Text(tr('Tạo nhiệm vụ thành công', 'Quest created successfully'))),
       );
       navigator.pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const ParentMainNavigationScreen()),
@@ -198,7 +199,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       );
     } catch (e) {
       if (!mounted) return;
-      _showMessage('Lỗi tạo nhiệm vụ: $e');
+      _showMessage(tr('Lỗi tạo nhiệm vụ: $e', 'Create quest error: $e'));
     } finally {
       if (mounted) {
         setState(() => isLoading = false);
@@ -222,7 +223,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
 
   String get selectedChildName {
     final child = selectedChild;
-    if (child == null) return 'Chưa chọn bé';
+    if (child == null) return tr('Chưa chọn bé', 'No child selected');
 
     final username = child['username']?.toString() ?? '';
     if (username.isNotEmpty) return username;
@@ -230,11 +231,12 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     final email = child['email']?.toString() ?? '';
     if (email.isNotEmpty) return email;
 
-    return child['uid']?.toString() ?? 'Bé';
+    return child['uid']?.toString() ?? tr('Bé', 'Child');
   }
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final familyProvider = context.watch<FamilyProvider>();
 
     if (familyProvider.children.isEmpty) {
@@ -245,7 +247,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     }
 
     final previewTitle = titleController.text.trim().isEmpty
-        ? 'Làm bài tập toán'
+        ? tr('Làm bài tập toán', 'Do math homework')
         : titleController.text.trim();
 
     final previewDeadline = deadlineController.text.trim().isEmpty
@@ -269,22 +271,22 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               _formCard(
                 children: [
                   _inputField(
-                    label: 'Tên nhiệm vụ',
+                    label: tr('Tên nhiệm vụ', 'Quest name'),
                     icon: '📋',
                     controller: titleController,
-                    hint: 'Ví dụ: Làm bài tập toán',
+                    hint: tr('Ví dụ: Làm bài tập toán', 'Example: Do math homework'),
                     onChanged: (_) => setState(() {}),
                   ),
                   _inputField(
-                    label: 'Mô tả nhiệm vụ',
+                    label: tr('Mô tả nhiệm vụ', 'Quest description'),
                     icon: '📝',
                     controller: descriptionController,
-                    hint: 'Mô tả chi tiết nhiệm vụ cần hoàn thành...',
+                    hint: tr('Mô tả chi tiết nhiệm vụ cần hoàn thành...', 'Describe the quest to complete in detail...'),
                     maxLines: 4,
                     onChanged: (_) => setState(() {}),
                   ),
                   _inputField(
-                    label: 'Hạn chót (Deadline)',
+                    label: tr('Hạn chót (Deadline)', 'Deadline'),
                     icon: '⏰',
                     controller: deadlineController,
                     readOnly: true,
@@ -294,18 +296,18 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   ),
                 ],
               ),
-              _sectionTitle('Giao cho bé', 'Chọn người nhận'),
+              _sectionTitle(tr('Giao cho bé', 'Assign to child'), tr('Chọn người nhận', 'Choose recipient')),
               _childGrid(familyProvider.children),
-              _sectionTitle('Độ khó', 'Mức độ thử thách'),
+              _sectionTitle(tr('Độ khó', 'Difficulty'), tr('Mức độ thử thách', 'Challenge level')),
               _difficultyRow(),
-              _sectionTitle('Phần thưởng', 'Kinh nghiệm & Vàng'),
+              _sectionTitle(tr('Phần thưởng', 'Rewards'), tr('Kinh nghiệm & Vàng', 'Experience & Gold')),
               _formCard(
                 children: [
                   Row(
                     children: [
                       Expanded(
                         child: _inputField(
-                          label: 'Kinh nghiệm (EXP)',
+                          label: tr('Kinh nghiệm (EXP)', 'Experience (EXP)'),
                           icon: '⭐',
                           controller: expController,
                           hint: '50',
@@ -316,7 +318,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: _inputField(
-                          label: 'Vàng thưởng',
+                          label: tr('Vàng thưởng', 'Gold reward'),
                           icon: '🎁',
                           controller: rewardController,
                           hint: '20',
@@ -329,7 +331,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   _categoryDropdown(),
                 ],
               ),
-              _sectionTitle('Xem trước nhiệm vụ', 'Trước khi tạo'),
+              _sectionTitle(tr('Xem trước nhiệm vụ', 'Quest preview'), tr('Trước khi tạo', 'Before creating')),
               _previewCard(
                 title: previewTitle,
                 deadline: previewDeadline,
@@ -341,7 +343,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 children: [
                   Expanded(
                     child: _actionButton(
-                      text: 'Hủy bỏ',
+                      text: tr('Hủy bỏ', 'Cancel'),
                       isPrimary: false,
                       onTap: isLoading ? null : () => Navigator.pop(context),
                     ),
@@ -350,7 +352,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   Expanded(
                     flex: 2,
                     child: _actionButton(
-                      text: isLoading ? 'Đang tạo...' : 'Giao nhiệm vụ ngay',
+                      text: isLoading ? tr('Đang tạo...', 'Creating...') : tr('Giao nhiệm vụ ngay', 'Assign quest now'),
                       isPrimary: true,
                       onTap: isLoading ? null : createTask,
                     ),
@@ -369,10 +371,10 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _topIconButton(Icons.arrow_back, () => Navigator.pop(context)),
-        const Column(
+        Column(
           children: [
             Text(
-              'Tạo nhiệm vụ',
+              tr('Tạo nhiệm vụ', 'Create quest'),
               style: TextStyle(
                 color: Color(0xff2d243b),
                 fontSize: 22,
@@ -381,7 +383,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             ),
             SizedBox(height: 3),
             Text(
-              'Tạo nhiệm vụ mới cho bé',
+              tr('Tạo nhiệm vụ mới cho bé', 'Create a new quest for your child'),
               style: TextStyle(color: Color(0xff8b7c99), fontSize: 13),
             ),
           ],
@@ -433,11 +435,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           ),
         ],
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Giao nhiệm vụ mới',
+            tr('Giao nhiệm vụ mới', 'Assign a new quest'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 28,
@@ -446,7 +448,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           ),
           SizedBox(height: 8),
           Text(
-            'Tạo nhiệm vụ cho con, đặt EXP, vàng thưởng và theo dõi tiến độ hoàn thành.',
+            tr('Tạo nhiệm vụ cho con, đặt EXP, vàng thưởng và theo dõi tiến độ hoàn thành.', 'Create quests for your child, set EXP and gold rewards, and track progress.'),
             style: TextStyle(color: Colors.white, height: 1.5, fontSize: 14),
           ),
         ],
@@ -577,8 +579,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: const Color(0xffeee3fb)),
         ),
-        child: const Text(
-          'Chưa có bé nào được liên kết',
+        child: Text(
+          tr('Chưa có bé nào được liên kết', 'No child linked yet'),
           style: TextStyle(color: Color(0xff8b7c99)),
         ),
       );
@@ -655,7 +657,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Cấp $level • $exp EXP',
+                  tr('Cấp $level • $exp EXP', 'Level $level • $exp EXP'),
                   style: const TextStyle(
                     color: Color(0xff8b7c99),
                     fontSize: 12,
@@ -707,7 +709,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                   ),
                 ),
                 child: Text(
-                  entry.value,
+                  trv(entry.value),
                   style: const TextStyle(fontWeight: FontWeight.w900),
                 ),
               ),
@@ -724,8 +726,8 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Danh mục nhiệm vụ',
+          Text(
+            tr('Danh mục nhiệm vụ', 'Quest category'),
             style: TextStyle(
               color: Color(0xff2d243b),
               fontSize: 13,
@@ -744,16 +746,16 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               child: DropdownButton<String>(
                 value: category,
                 isExpanded: true,
-                items: const [
-                  DropdownMenuItem(value: 'Study', child: Text('📚 Học tập')),
+                items: [
+                  DropdownMenuItem(value: 'Study', child: Text(tr('📚 Học tập', '📚 Study'))),
                   DropdownMenuItem(
                     value: 'Housework',
-                    child: Text('🏠 Việc nhà'),
+                    child: Text(tr('🏠 Việc nhà', '🏠 Housework')),
                   ),
-                  DropdownMenuItem(value: 'Health', child: Text('💪 Rèn luyện sức khỏe')),
+                  DropdownMenuItem(value: 'Health', child: Text(tr('💪 Rèn luyện sức khỏe', '💪 Health training'))),
                   DropdownMenuItem(
                     value: 'Daily Quest',
-                    child: Text('⚔️ Nhiệm vụ hàng ngày'),
+                    child: Text(tr('⚔️ Nhiệm vụ hàng ngày', '⚔️ Daily quest')),
                   ),
                 ],
                 onChanged: isLoading
@@ -834,7 +836,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Giao cho: $selectedChildName • Hạn chót: $deadline',
+                      tr('Giao cho: $selectedChildName • Hạn chót: $deadline', 'Assigned to: $selectedChildName • Deadline: $deadline'),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -858,12 +860,12 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
                 const Color(0xff7048ff),
               ),
               _tag(
-                '🎁 +$coin Vàng',
+                tr('🎁 +$coin Vàng', '🎁 +$coin Gold'),
                 const Color(0xfffff3df),
                 const Color(0xffff8a00),
               ),
               _tag(
-                difficulty,
+                trv(difficulty),
                 const Color(0xffe8f0ff),
                 const Color(0xff2b6bd6),
               ),

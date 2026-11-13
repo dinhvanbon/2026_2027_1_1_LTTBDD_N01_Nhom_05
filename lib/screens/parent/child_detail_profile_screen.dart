@@ -10,6 +10,7 @@ import '../../providers/task_provider.dart';
 import '../shared/activity_log_screen.dart';
 import 'create_task_screen.dart';
 
+import '../../providers/language_provider.dart';
 class ChildDetailProfileScreen extends StatelessWidget {
   final String childId;
   final Map<String, dynamic> childData;
@@ -47,6 +48,7 @@ class ChildDetailProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final tasks = context
         .watch<TaskProvider>()
         .tasks
@@ -100,9 +102,9 @@ class ChildDetailProfileScreen extends StatelessWidget {
                         badges: unlockedCount,
                         coins: coins,
                       ),
-                      _section('Nhiệm vụ gần đây', 'Xem tất cả'),
+                      _section(tr('Nhiệm vụ gần đây', 'Recent quests'), tr('Xem tất cả', 'View all')),
                       _recentTasks(tasks),
-                      _section('Thành tựu', 'Tất cả'),
+                      _section(tr('Thành tựu', 'Achievements'), tr('Tất cả', 'All')),
                       _achievements(achievements),
                     ],
                   );
@@ -121,11 +123,11 @@ class ChildDetailProfileScreen extends StatelessWidget {
     return Row(
       children: [
         _topButton(icon: Icons.arrow_back, onTap: () => Navigator.pop(context)),
-        const Expanded(
+        Expanded(
           child: Column(
             children: [
               Text(
-                'Hồ sơ của bé',
+                tr('Hồ sơ của bé', 'Child profile'),
                 style: TextStyle(
                   color: Color(0xff2d243b),
                   fontSize: 22,
@@ -134,7 +136,7 @@ class ChildDetailProfileScreen extends StatelessWidget {
               ),
               SizedBox(height: 3),
               Text(
-                'Góc nhìn phụ huynh',
+                tr('Góc nhìn phụ huynh', 'Parent view'),
                 style: TextStyle(color: Color(0xff8b7c99), fontSize: 13),
               ),
             ],
@@ -229,12 +231,12 @@ class ChildDetailProfileScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 5),
-          const Text(
-            'Chiến binh nhí • Hoạt động mỗi ngày',
+          Text(
+            tr('Chiến binh nhí • Hoạt động mỗi ngày', 'Little warrior • Active every day'),
             style: TextStyle(color: Colors.white, fontSize: 14),
           ),
           const SizedBox(height: 15),
-          Wrap(spacing: 10, children: [_badge('Cấp $level'), _badge('Đang hoạt động')]),
+          Wrap(spacing: 10, children: [_badge(tr('Cấp $level', 'Level $level')), _badge(tr('Đang hoạt động', 'Active'))]),
         ],
       ),
     );
@@ -326,9 +328,9 @@ class ChildDetailProfileScreen extends StatelessWidget {
       crossAxisSpacing: 12,
       childAspectRatio: 0.95,
       children: [
-        _stat(Icons.assignment, '$tasks', 'Nhiệm vụ'),
-        _stat(Icons.emoji_events, '$badges', 'Huy hiệu'),
-        _stat(Icons.star, '$coins', 'Vàng'),
+        _stat(Icons.assignment, '$tasks', tr('Nhiệm vụ', 'Quests')),
+        _stat(Icons.emoji_events, '$badges', tr('Huy hiệu', 'Badges')),
+        _stat(Icons.star, '$coins', tr('Vàng', 'Gold')),
       ],
     );
   }
@@ -400,7 +402,7 @@ class ChildDetailProfileScreen extends StatelessWidget {
     final recent = tasks.take(2).toList();
 
     if (recent.isEmpty) {
-      return _emptyCard('Chưa có nhiệm vụ gần đây.');
+      return _emptyCard(tr('Chưa có nhiệm vụ gần đây.', 'No recent quests.'));
     }
 
     return Column(
@@ -488,7 +490,7 @@ class ChildDetailProfileScreen extends StatelessWidget {
     List<QueryDocumentSnapshot<Map<String, dynamic>>> achievements,
   ) {
     if (achievements.isEmpty) {
-      return _emptyCard('Chưa có achievement nào.');
+      return _emptyCard(tr('Chưa có achievement nào.', 'No achievements yet.'));
     }
 
     return Column(
@@ -557,7 +559,7 @@ class ChildDetailProfileScreen extends StatelessWidget {
                     Text(
                       description.isNotEmpty
                           ? description
-                          : 'Yêu cầu level $requiredLevel',
+                          : tr('Yêu cầu level $requiredLevel', 'Requires level $requiredLevel'),
                       style: const TextStyle(
                         color: Color(0xff8b7c99),
                         fontSize: 12,
@@ -578,7 +580,7 @@ class ChildDetailProfileScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  unlocked ? 'ĐÃ MỞ' : 'CẤP $requiredLevel',
+                  unlocked ? tr('ĐÃ MỞ', 'UNLOCKED') : tr('CẤP $requiredLevel', 'LEVEL $requiredLevel'),
                   style: TextStyle(
                     color: unlocked
                         ? const Color(0xff1c9b43)
@@ -615,8 +617,8 @@ class ChildDetailProfileScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(22),
                 ),
               ),
-              child: const Text(
-                'Nhật ký hoạt động',
+              child: Text(
+                tr('Nhật ký hoạt động', 'Activity log'),
                 style: TextStyle(fontWeight: FontWeight.w900),
               ),
             ),
@@ -640,8 +642,8 @@ class ChildDetailProfileScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(22),
                 ),
               ),
-              child: const Text(
-                'Giao việc ngay',
+              child: Text(
+                tr('Giao việc ngay', 'Assign now'),
                 style: TextStyle(fontWeight: FontWeight.w900),
               ),
             ),

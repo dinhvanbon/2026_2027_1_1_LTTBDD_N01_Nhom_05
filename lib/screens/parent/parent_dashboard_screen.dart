@@ -17,6 +17,7 @@ import 'parent_reward_management_screen.dart';
 import 'manage_child_screen.dart';
 import 'verify_task_screen.dart';
 
+import '../../providers/language_provider.dart';
 class ParentDashboardScreen extends StatelessWidget {
   const ParentDashboardScreen({super.key});
 
@@ -72,6 +73,7 @@ class ParentDashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final taskProvider = context.watch<TaskProvider>();
     final tasks = taskProvider.tasks;
     final submittedTasks = taskProvider.submittedTasks;
@@ -121,13 +123,13 @@ class ParentDashboardScreen extends StatelessWidget {
                       totalExp: totalExp,
                       totalCoins: totalCoins,
                     ),
-                    _sectionTitle('Truy cập nhanh', 'Tất cả công cụ'),
+                    _sectionTitle(tr('Truy cập nhanh', 'Quick access'), tr('Tất cả công cụ', 'All tools')),
                     _quickGrid(context),
-                    _sectionTitle('Cần xử lý ngay', 'Xem tất cả'),
+                    _sectionTitle(tr('Cần xử lý ngay', 'Needs action'), tr('Xem tất cả', 'View all')),
                     _pendingAlerts(context, submittedTasks),
-                    _sectionTitle('Tiến độ của bé', 'Chi tiết'),
+                    _sectionTitle(tr('Tiến độ của bé', 'Child progress'), tr('Chi tiết', 'Details')),
                     _childrenProgress(children),
-                    _sectionTitle('Hoạt động gần đây', 'Hôm nay'),
+                    _sectionTitle(tr('Hoạt động gần đây', 'Recent activity'), tr('Hôm nay', 'Today')),
                     _recentActivities(tasks),
                   ],
                 ),
@@ -233,7 +235,7 @@ class ParentDashboardScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 14),
                         Text(
-                          'Xin chào,\n$username',
+                          tr('Xin chào,\n$username', 'Hello,\n$username'),
                           style: const TextStyle(
                             color: Color(0xff2d243b),
                             fontSize: 34,
@@ -242,8 +244,8 @@ class ParentDashboardScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Quản lý nhiệm vụ của con hôm nay',
+                        Text(
+                          tr('Quản lý nhiệm vụ của con hôm nay', 'Manage your child quests today'),
                           style: TextStyle(
                             color: Color(0xff8b7c99),
                             fontSize: 16,
@@ -304,8 +306,8 @@ class ParentDashboardScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Tổng quan gia đình',
+          Text(
+            tr('Tổng quan gia đình', 'Family overview'),
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -314,7 +316,7 @@ class ParentDashboardScreen extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            '$submittedTasks Chờ duyệt',
+            tr('$submittedTasks Chờ duyệt', '$submittedTasks Pending'),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 40,
@@ -324,8 +326,8 @@ class ParentDashboardScreen extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             submittedTasks == 0
-                ? 'Không có nhiệm vụ nào đang chờ xác nhận.'
-                : 'Có $submittedTasks nhiệm vụ đang chờ xác nhận. Hãy duyệt để con nhận EXP và vàng.',
+                ? tr('Không có nhiệm vụ nào đang chờ xác nhận.', 'No quests waiting for approval.')
+                : tr('Có $submittedTasks nhiệm vụ đang chờ xác nhận. Hãy duyệt để con nhận EXP và vàng.', '$submittedTasks quests are waiting for approval. Approve them so your child gets EXP and gold.'),
             style: const TextStyle(
               color: Colors.white,
               height: 1.5,
@@ -337,7 +339,7 @@ class ParentDashboardScreen extends StatelessWidget {
             children: [
               Expanded(
                 child: _heroButton(
-                  text: 'Giao việc ngay',
+                  text: tr('Giao việc ngay', 'Assign now'),
                   primary: true,
                   onTap: () => _open(context, const CreateTaskScreen()),
                 ),
@@ -345,7 +347,7 @@ class ParentDashboardScreen extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: _heroButton(
-                  text: 'Duyệt ngay',
+                  text: tr('Duyệt ngay', 'Approve now'),
                   primary: false,
                   onTap: () => _open(context, const VerifyTaskScreen()),
                 ),
@@ -403,25 +405,25 @@ class ParentDashboardScreen extends StatelessWidget {
         _statCard(
           icon: Icons.assignment_outlined,
           value: '$totalTasks',
-          label: 'Tổng nhiệm vụ',
+          label: tr('Tổng nhiệm vụ', 'Total quests'),
           color: const Color(0xff7048ff),
         ),
         _statCard(
           icon: Icons.verified_outlined,
           value: '$submittedTasks',
-          label: 'Cần duyệt việc',
+          label: tr('Cần duyệt việc', 'To approve'),
           color: const Color(0xffff9f43),
         ),
         _statCard(
           icon: Icons.star_outline,
           value: '$totalExp',
-          label: 'Tổng EXP đã cấp',
+          label: tr('Tổng EXP đã cấp', 'Total EXP given'),
           color: const Color(0xff2b6bd6),
         ),
         _statCard(
           icon: Icons.card_giftcard,
           value: _formatMoney(totalCoins),
-          label: 'Vàng đã thưởng',
+          label: tr('Vàng đã thưởng', 'Gold rewarded'),
           color: const Color(0xff2ecc71),
         ),
       ],
@@ -506,32 +508,32 @@ class ParentDashboardScreen extends StatelessWidget {
     final items = [
       _QuickItem(
         icon: Icons.add_task,
-        title: 'Giao việc',
+        title: tr('Giao việc', 'Assign'),
         onTap: () => _open(context, const CreateTaskScreen()),
       ),
       _QuickItem(
         icon: Icons.verified,
-        title: 'Duyệt việc',
+        title: tr('Duyệt việc', 'Approve'),
         onTap: () => _open(context, const VerifyTaskScreen()),
       ),
       _QuickItem(
         icon: Icons.card_giftcard,
-        title: 'Đổi quà',
+        title: tr('Đổi quà', 'Redeem'),
         onTap: () => _open(context, const ParentRewardManagementScreen()),
       ),
       _QuickItem(
         icon: Icons.child_care,
-        title: 'Con cái',
+        title: tr('Con cái', 'Children'),
         onTap: () => _open(context, const ManageChildScreen()),
       ),
       _QuickItem(
         icon: Icons.leaderboard,
-        title: 'Bảng xếp hạng',
+        title: tr('Bảng xếp hạng', 'Leaderboard'),
         onTap: () => _open(context, const LeaderboardScreen()),
       ),
       _QuickItem(
         icon: Icons.history,
-        title: 'Lịch sử',
+        title: tr('Lịch sử', 'History'),
         onTap: () => _open(context, const ActivityLogScreen()),
       ),
     ];
@@ -584,7 +586,7 @@ class ParentDashboardScreen extends StatelessWidget {
 
   Widget _pendingAlerts(BuildContext context, List<TaskModel> submittedTasks) {
     if (submittedTasks.isEmpty) {
-      return _emptyCard('Không có nhiệm vụ cần xác nhận.');
+      return _emptyCard(tr('Không có nhiệm vụ cần xác nhận.', 'No quests to approve.'));
     }
 
     final visibleTasks = submittedTasks.take(2).toList();
@@ -634,8 +636,8 @@ class ParentDashboardScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Con đã gửi bằng chứng, đang chờ xác nhận.',
+                    Text(
+                      tr('Con đã gửi bằng chứng, đang chờ xác nhận.', 'Your child sent proof, waiting for approval.'),
                       style: TextStyle(
                         color: Color(0xff8b7c99),
                         fontSize: 12,
@@ -647,7 +649,7 @@ class ParentDashboardScreen extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () => _open(context, const VerifyTaskScreen()),
-                child: const Text('Duyệt ngay'),
+                child: Text(tr('Duyệt ngay', 'Approve now')),
               ),
             ],
           ),
@@ -660,7 +662,7 @@ class ParentDashboardScreen extends StatelessWidget {
     List<QueryDocumentSnapshot<Map<String, dynamic>>> children,
   ) {
     if (children.isEmpty) {
-      return _emptyCard('Chưa có child được liên kết.');
+      return _emptyCard(tr('Chưa có child được liên kết.', 'No child linked yet.'));
     }
 
     return Column(
@@ -724,7 +726,7 @@ class ParentDashboardScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '$coins vàng đã nhận',
+                          tr('$coins vàng đã nhận', '$coins gold received'),
                           style: const TextStyle(
                             color: Color(0xff8b7c99),
                             fontSize: 12,
@@ -743,7 +745,7 @@ class ParentDashboardScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      'Cấp $level',
+                      tr('Cấp $level', 'Level $level'),
                       style: const TextStyle(
                         color: Color(0xff7048ff),
                         fontSize: 12,
@@ -796,7 +798,7 @@ class ParentDashboardScreen extends StatelessWidget {
     final recent = tasks.take(3).toList();
 
     if (recent.isEmpty) {
-      return _emptyCard('Chưa có hoạt động gần đây.');
+      return _emptyCard(tr('Chưa có hoạt động gần đây.', 'No recent activity.'));
     }
 
     return Column(

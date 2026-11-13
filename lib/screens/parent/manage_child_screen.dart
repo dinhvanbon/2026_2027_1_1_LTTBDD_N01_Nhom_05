@@ -10,6 +10,7 @@ import '../../providers/task_provider.dart';
 import '../../providers/family_provider.dart';
 import 'child_detail_profile_screen.dart';
 
+import '../../providers/language_provider.dart';
 class ManageChildScreen extends StatefulWidget {
   const ManageChildScreen({super.key});
 
@@ -66,6 +67,7 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final tasks = context.watch<TaskProvider>().tasks;
 
     return Scaffold(
@@ -137,7 +139,7 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
             controller: _codeController,
             textCapitalization: TextCapitalization.characters,
             decoration: InputDecoration(
-              labelText: 'Nhập mã liên kết của con (VD: KQ123ABC)',
+              labelText: tr('Nhập mã liên kết của con (VD: KQ123ABC)', 'Enter your child link code (e.g. KQ123ABC)'),
               prefixIcon: const Icon(Icons.link),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(18),
@@ -160,7 +162,7 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
 
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Liên kết thành công')),
+                      SnackBar(content: Text(tr('Liên kết thành công', 'Linked successfully'))),
                     );
                   }
                 } catch (e) {
@@ -171,7 +173,7 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
                   }
                 }
               },
-              child: const Text('Liên kết với bé'),
+              child: Text(tr('Liên kết với bé', 'Link with child')),
             ),
           ),
         ],
@@ -182,12 +184,12 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
   Widget _header(BuildContext context) {
     return Row(
       children: [
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Danh sách các bé',
+                tr('Danh sách các bé', 'Children list'),
                 style: TextStyle(
                   color: Color(0xff2d243b),
                   fontSize: 24,
@@ -196,7 +198,7 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
               ),
               SizedBox(height: 4),
               Text(
-                'Quản lý tiến độ của con',
+                tr('Quản lý tiến độ của con', 'Manage your child progress'),
                 style: TextStyle(color: Color(0xff8b7c99), fontSize: 13),
               ),
             ],
@@ -249,8 +251,8 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Danh sách các bé đã kết nối với tài khoản gia đình',
+          Text(
+            tr('Danh sách các bé đã kết nối với tài khoản gia đình', 'Children connected to the family account'),
             style: TextStyle(color: Colors.white, fontSize: 14, height: 1.4),
           ),
         ],
@@ -276,9 +278,9 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
       crossAxisSpacing: 12,
       childAspectRatio: 0.95,
       children: [
-        _statCard(Icons.star, '$totalExp', 'Tổng EXP'),
-        _statCard(Icons.assignment, '$totalTasks', 'Nhiệm vụ'),
-        _statCard(Icons.card_giftcard, '$totalCoins', 'Vàng'),
+        _statCard(Icons.star, '$totalExp', tr('Tổng EXP', 'Total EXP')),
+        _statCard(Icons.assignment, '$totalTasks', tr('Nhiệm vụ', 'Quests')),
+        _statCard(Icons.card_giftcard, '$totalCoins', tr('Vàng', 'Gold')),
       ],
     );
   }
@@ -328,7 +330,7 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
   }) {
     final name = data['username']?.toString().isNotEmpty == true
         ? data['username'].toString()
-        : data['email']?.toString() ?? 'Bé';
+        : data['email']?.toString() ?? tr('Bé', 'Child');
 
     final level = _asInt(data['level']);
     final exp = _asInt(data['exp']);
@@ -408,7 +410,7 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '$completedTasks nhiệm vụ hoàn thành',
+                          tr('$completedTasks nhiệm vụ hoàn thành', '$completedTasks quests completed'),
                           style: const TextStyle(
                             color: Color(0xff8b7c99),
                             fontSize: 13,
@@ -427,7 +429,7 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
-                      'Cấp $level',
+                      tr('Cấp $level', 'Level $level'),
                       style: const TextStyle(
                         color: Color(0xff7048ff),
                         fontSize: 12,
@@ -451,8 +453,8 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
               Row(
                 children: [
                   Expanded(child: _childData('$exp', 'EXP')),
-                  Expanded(child: _childData('$badges', 'Huy hiệu')),
-                  Expanded(child: _childData('$coins', 'Vàng')),
+                  Expanded(child: _childData('$badges', tr('Huy hiệu', 'Badges'))),
+                  Expanded(child: _childData('$coins', tr('Vàng', 'Gold'))),
                 ],
               ),
               const SizedBox(height: 15),
@@ -478,8 +480,8 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
                       borderRadius: BorderRadius.circular(18),
                     ),
                   ),
-                  child: const Text(
-                    'Xem hồ sơ',
+                  child: Text(
+                    tr('Xem hồ sơ', 'View profile'),
                     style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                 ),
@@ -518,8 +520,8 @@ class _ManageChildScreenState extends State<ManageChildScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
       ),
-      child: const Text(
-        'Chưa có bé nào được liên kết.',
+      child: Text(
+        tr('Chưa có bé nào được liên kết.', 'No child linked yet.'),
         style: TextStyle(color: Color(0xff8b7c99)),
       ),
     );

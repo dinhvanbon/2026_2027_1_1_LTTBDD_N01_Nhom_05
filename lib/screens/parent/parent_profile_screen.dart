@@ -12,6 +12,7 @@ import '../auth/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 
+import '../../providers/language_provider.dart';
 class ParentProfileScreen extends StatelessWidget {
   const ParentProfileScreen({super.key});
 
@@ -120,13 +121,13 @@ class ParentProfileScreen extends StatelessWidget {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Thêm liên kết với Bé'),
+          title: Text(tr('Thêm liên kết với Bé', 'Link a child')),
           content: TextField(
             controller: linkCodeController,
             textCapitalization: TextCapitalization.characters,
-            decoration: const InputDecoration(
-              labelText: 'Mã liên kết',
-              hintText: 'Nhập mã liên kết của bé, ví dụ KQFPX5UF',
+            decoration: InputDecoration(
+              labelText: tr('Mã liên kết', 'Link code'),
+              hintText: tr('Nhập mã liên kết của bé, ví dụ KQFPX5UF', 'Enter the child link code, e.g. KQFPX5UF'),
             ),
           ),
 
@@ -135,7 +136,7 @@ class ParentProfileScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(dialogContext);
               },
-              child: const Text('Hủy'),
+              child: Text(tr('Hủy', 'Cancel')),
             ),
 
             FilledButton(
@@ -156,18 +157,18 @@ class ParentProfileScreen extends StatelessWidget {
                   Navigator.pop(dialogContext);
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Liên kết Child thành công')),
+                    SnackBar(content: Text(tr('Liên kết Child thành công', 'Child linked successfully'))),
                   );
                 } catch (e) {
                   if (!context.mounted) return;
 
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+                  ).showSnackBar(SnackBar(content: Text(tr('Lỗi: $e', 'Error: $e'))));
                 }
               },
 
-              child: const Text('Liên kết'),
+              child: Text(tr('Liên kết', 'Link')),
             ),
           ],
         );
@@ -329,6 +330,7 @@ class ParentProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final taskProvider = context.watch<TaskProvider>();
     final childProvider = context.watch<ChildProvider>();
     final familyProvider = context.watch<FamilyProvider>();
@@ -355,14 +357,14 @@ class ParentProfileScreen extends StatelessWidget {
 
         if (snapshot.hasError) {
           return Scaffold(
-            body: Center(child: Text('Lỗi tải profile: ${snapshot.error}')),
+            body: Center(child: Text(tr('Lỗi tải profile: ${snapshot.error}', 'Profile loading error: ${snapshot.error}'))),
           );
         }
 
         if (snapshot.data == null) {
-          return const Scaffold(
+          return Scaffold(
             body: Center(
-              child: Text('Không tìm thấy thông tin Parent Profile'),
+              child: Text(tr('Không tìm thấy thông tin Parent Profile', 'Parent profile not found')),
             ),
           );
         }
@@ -389,7 +391,7 @@ class ParentProfileScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       topButton('←', () => Navigator.pop(context)),
-                      const Column(
+                      Column(
                         children: [
                           Text(
                             'Parent Profile',
@@ -401,7 +403,7 @@ class ParentProfileScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 3),
                           Text(
-                            'Thông tin phụ huynh',
+                            tr('Thông tin phụ huynh', 'Parent information'),
                             style: TextStyle(
                               color: Color(0xff8b7c99),
                               fontSize: 13,
@@ -455,7 +457,7 @@ class ParentProfileScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 6),
                         Text(
-                          'Parent Account\nQuản lý nhiệm vụ, xác nhận và trao thưởng cho con',
+                          tr('Parent Account\nQuản lý nhiệm vụ, xác nhận và trao thưởng cho con', 'Parent Account\nManage quests, approve and reward your child'),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white, height: 1.5),
                         ),
@@ -469,7 +471,7 @@ class ParentProfileScreen extends StatelessWidget {
                         child: statCard(
                           icon: '👦',
                           value: '${familyProvider.children.length}',
-                          label: 'Số bé',
+                          label: tr('Số bé', 'Children'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -477,7 +479,7 @@ class ParentProfileScreen extends StatelessWidget {
                         child: statCard(
                           icon: '📋',
                           value: '${taskProvider.tasks.length}',
-                          label: 'Nhiệm vụ',
+                          label: tr('Nhiệm vụ', 'Quests'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -485,12 +487,12 @@ class ParentProfileScreen extends StatelessWidget {
                         child: statCard(
                           icon: '🎁',
                           value: '${childProvider.totalReward}',
-                          label: 'Quà tặng',
+                          label: tr('Quà tặng', 'Gifts'),
                         ),
                       ),
                     ],
                   ),
-                  sectionTitle('Thông tin tài khoản', action: 'Sửa'),
+                  sectionTitle(tr('Thông tin tài khoản', 'Account information'), action: tr('Sửa', 'Edit')),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -501,15 +503,15 @@ class ParentProfileScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         infoRow('Email', email),
-                        infoRow('Số điện thoại', phone),
-                        infoRow('Vai trò', 'Phụ huynh'),
-                        infoRow('Ngày tham gia', 'Học kỳ I 2026'),
+                        infoRow(tr('Số điện thoại', 'Phone number'), phone),
+                        infoRow(tr('Vai trò', 'Role'), tr('Phụ huynh', 'Parent')),
+                        infoRow(tr('Ngày tham gia', 'Joined'), tr('Học kỳ I 2026', 'Semester I 2026')),
                       ],
                     ),
                   ),
                   sectionTitle(
-                    'Danh sách các bé',
-                    action: 'Thêm bé',
+                    tr('Danh sách các bé', 'Children list'),
+                    action: tr('Thêm bé', 'Add child'),
                     onActionTap: () {
                       showAddChildDialog(context);
                     },
@@ -518,8 +520,8 @@ class ParentProfileScreen extends StatelessWidget {
                   ...familyProvider.children.map((child) {
                     return childCard(
                       icon: '🧒',
-                      name: child['username'] ?? 'Bé',
-                      level: 'Cấp ${child['level'] ?? 1}',
+                      name: child['username'] ?? tr('Bé', 'Child'),
+                      level: tr('Cấp ${child['level'] ?? 1}', 'Level ${child[\'level\'] ?? 1}'),
                       progress: ((child['exp'] ?? 0) / 100).clamp(0, 1),
                       onUnlink: () async {
                         await context.read<FamilyProvider>().unlinkChild(
@@ -529,23 +531,23 @@ class ParentProfileScreen extends StatelessWidget {
                         if (!context.mounted) return;
 
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Đã hủy liên kết với bé'),
+                          SnackBar(
+                            content: Text(tr('Đã hủy liên kết với bé', 'Child unlinked')),
                           ),
                         );
                       },
                     );
                   }),
-                  sectionTitle('Cài đặt'),
+                  sectionTitle(tr('Cài đặt', 'Settings')),
                   settingCard(
                     icon: '🔔',
-                    title: 'Thông báo',
-                    subtitle: 'Nhận thông báo khi con hoàn thành nhiệm vụ',
+                    title: tr('Thông báo', 'Notifications'),
+                    subtitle: tr('Nhận thông báo khi con hoàn thành nhiệm vụ', 'Get notified when your child completes a quest'),
                   ),
                   settingCard(
                     icon: '🌙',
-                    title: 'Chế độ tối (Dark Mode)',
-                    subtitle: 'Tùy chỉnh giao diện hiển thị',
+                    title: tr('Chế độ tối (Dark Mode)', 'Dark Mode'),
+                    subtitle: tr('Tùy chỉnh giao diện hiển thị', 'Customize the display theme'),
                   ),
                   FilledButton(
                     onPressed: () async {
@@ -563,8 +565,8 @@ class ParentProfileScreen extends StatelessWidget {
 
                       if (updated == true && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Cập nhật thông tin thành công'),
+                          SnackBar(
+                            content: Text(tr('Cập nhật thông tin thành công', 'Profile updated successfully')),
                           ),
                         );
                       }
@@ -573,7 +575,7 @@ class ParentProfileScreen extends StatelessWidget {
                       minimumSize: const Size.fromHeight(56),
                       backgroundColor: const Color(0xff7048ff),
                     ),
-                    child: const Text('Chỉnh sửa thông tin'),
+                    child: Text(tr('Chỉnh sửa thông tin', 'Edit profile')),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton(
@@ -594,7 +596,7 @@ class ParentProfileScreen extends StatelessWidget {
                       backgroundColor: const Color(0xfffff0f0),
                       side: const BorderSide(color: Color(0xffffd4d4)),
                     ),
-                    child: const Text('Đăng xuất'),
+                    child: Text(tr('Đăng xuất', 'Log out')),
                   ),
                 ],
               ),

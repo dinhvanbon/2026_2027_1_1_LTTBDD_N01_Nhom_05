@@ -1,3 +1,4 @@
+import '../providers/language_provider.dart';
 enum TaskStatus { pending, submitted, approved, rejected }
 
 class TaskModel {
@@ -137,7 +138,7 @@ class TaskModel {
   }
 
   String get deadlineText {
-    if (deadlineAt == null) return 'Không có hạn';
+    if (deadlineAt == null) return tr('Không có hạn', 'No deadline');
     final d = deadlineAt!;
     return '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')} ${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
   }
@@ -145,13 +146,13 @@ class TaskModel {
   String get statusText {
     switch (status) {
       case TaskStatus.pending:
-        return 'Đang chờ làm';
+        return tr('Đang chờ làm', 'Waiting to do');
       case TaskStatus.submitted:
-        return 'Chờ phụ huynh xác nhận';
+        return tr('Chờ phụ huynh xác nhận', 'Waiting for parent approval');
       case TaskStatus.approved:
-        return 'Đã xác nhận';
+        return tr('Đã xác nhận', 'Approved');
       case TaskStatus.rejected:
-        return 'Bị từ chối';
+        return tr('Bị từ chối', 'Rejected');
     }
   }
 }

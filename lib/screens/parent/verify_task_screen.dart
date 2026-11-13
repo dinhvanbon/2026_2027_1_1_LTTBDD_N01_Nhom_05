@@ -13,6 +13,7 @@ import '../../services/task_service.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 
+import '../../providers/language_provider.dart';
 class VerifyTaskScreen extends StatelessWidget {
   const VerifyTaskScreen({super.key});
 
@@ -184,6 +185,7 @@ class VerifyTaskScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final tasks = context.watch<TaskProvider>().tasks.where((task) {
       return task.status == TaskStatus.submitted;
     }).toList();
@@ -209,10 +211,10 @@ class VerifyTaskScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   topButton('←', () => Navigator.pop(context)),
-                  const Column(
+                  Column(
                     children: [
                       Text(
-                        'Duyệt nhiệm vụ',
+                        tr('Duyệt nhiệm vụ', 'Approve quests'),
                         style: TextStyle(
                           fontSize: 22,
                           color: Color(0xff2d243b),
@@ -221,7 +223,7 @@ class VerifyTaskScreen extends StatelessWidget {
                       ),
                       SizedBox(height: 3),
                       Text(
-                        'Hệ thống phê duyệt của phụ huynh',
+                        tr('Hệ thống phê duyệt của phụ huynh', 'Parent approval system'),
                         style: TextStyle(
                           color: Color(0xff8b7c99),
                           fontSize: 13,
@@ -234,11 +236,11 @@ class VerifyTaskScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               if (tasks.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.only(top: 160),
                   child: Center(
                     child: Text(
-                      'Không có nhiệm vụ chờ xác nhận',
+                      tr('Không có nhiệm vụ chờ xác nhận', 'No quests waiting for approval'),
                       style: TextStyle(fontSize: 18, color: Color(0xff8b7c99)),
                     ),
                   ),
@@ -446,7 +448,7 @@ class VerifyTaskScreen extends StatelessWidget {
                                       : '${task.submittedAt!.hour}:${task.submittedAt!.minute.toString().padLeft(2, '0')}',
                                 ),
                                 const SizedBox(width: 12),
-                                _proofItem('Task Difficulty', task.difficulty),
+                                _proofItem(tr('Độ khó', 'Task Difficulty'), trv(task.difficulty)),
                               ],
                             ),
                           ],
@@ -465,16 +467,16 @@ class VerifyTaskScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '📝 Message from Child',
-                              style: TextStyle(
+                              tr('📝 Lời nhắn của con', '📝 Message from Child'),
+                              style: const TextStyle(
                                 color: Color(0xff2d243b),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             Text(
-                              '"${task.childNote ?? 'Con đã hoàn thành nhiệm vụ được giao rồi ạ.'}"',
-                              style: TextStyle(
+                              '"${task.childNote ?? tr('Con đã hoàn thành nhiệm vụ được giao rồi ạ.', 'I have completed the assigned quest.')}"',
+                              style: const TextStyle(
                                 color: Color(0xff6f6280),
                                 height: 1.7,
                               ),
@@ -507,22 +509,22 @@ class VerifyTaskScreen extends StatelessWidget {
                                 minimumSize: const Size.fromHeight(58),
                                 backgroundColor: const Color(0xff7048ff),
                               ),
-                              child: const Text('✔ Duyệt nhiệm vụ'),
+                              child: Text(tr('✔ Duyệt nhiệm vụ', '✔ Approve quest')),
                             ),
                           ),
                         ],
                       ),
-                      sectionTitle('Lịch sử duyệt gần đây', 'Hôm nay'),
+                      sectionTitle(tr('Lịch sử duyệt gần đây', 'Recent approval history'), tr('Hôm nay', 'Today')),
                       historyCard(
                         icon: '📘',
-                        title: 'Bài tập đã được duyệt',
-                        subtitle: '+40 EXP đã cộng cho bé',
+                        title: tr('Bài tập đã được duyệt', 'Homework approved'),
+                        subtitle: tr('+40 EXP đã cộng cho bé', '+40 EXP added for your child'),
                         time: '7:10 PM',
                       ),
                       historyCard(
                         icon: '🏆',
-                        title: 'Mở khóa thành tựu',
-                        subtitle: 'Đạt huy hiệu Hiệp sĩ học tập',
+                        title: tr('Mở khóa thành tựu', 'Achievement unlocked'),
+                        subtitle: tr('Đạt huy hiệu Hiệp sĩ học tập', 'Earned the Study Knight badge'),
                         time: '6:40 PM',
                       ),
                       const SizedBox(height: 28),
