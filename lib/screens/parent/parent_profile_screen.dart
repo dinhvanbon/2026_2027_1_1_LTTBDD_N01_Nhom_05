@@ -521,7 +521,7 @@ class ParentProfileScreen extends StatelessWidget {
                     return childCard(
                       icon: '🧒',
                       name: child['username'] ?? tr('Bé', 'Child'),
-                      level: tr('Cấp ${child['level'] ?? 1}', 'Level ${child[\'level\'] ?? 1}'),
+                      level: tr('Cấp ${child['level'] ?? 1}', 'Level ${child['level'] ?? 1}'),
                       progress: ((child['exp'] ?? 0) / 100).clamp(0, 1),
                       onUnlink: () async {
                         await context.read<FamilyProvider>().unlinkChild(
