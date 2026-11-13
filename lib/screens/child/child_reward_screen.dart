@@ -6,6 +6,7 @@ import '../../models/reward_model.dart';
 import '../../providers/reward_provider.dart';
 import '../../providers/activity_provider.dart';
 
+import '../../providers/language_provider.dart';
 class ChildRewardScreen extends StatefulWidget {
   const ChildRewardScreen({super.key});
 
@@ -230,8 +231,8 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
                         if (!context.mounted) return;
 
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Phiên đăng nhập hết hạn'),
+                          SnackBar(
+                            content: Text(tr('Phiên đăng nhập hết hạn', 'Session expired')),
                           ),
                         );
                         return;
@@ -250,13 +251,13 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
                       if (!context.mounted) return;
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Đổi thưởng thành công')),
+                        SnackBar(content: Text(tr('Đổi thưởng thành công', 'Reward redeemed successfully'))),
                       );
                     } catch (e) {
                       if (!context.mounted) return;
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Lỗi đổi thưởng: $e')),
+                        SnackBar(content: Text(tr('Lỗi đổi thưởng: $e', 'Redeem error: $e'))),
                       );
                     }
                   }
@@ -356,6 +357,7 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final rewardProvider = context.watch<RewardProvider>();
     final rewards = rewardProvider.rewards;
     final history = rewardProvider.history;
@@ -374,11 +376,11 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
                       children: [
                         topButton('←', () => Navigator.pop(context)),
                         const SizedBox(width: 8),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             children: [
                               Text(
-                                'Đổi thưởng',
+                                tr('Đổi thưởng', 'Redeem rewards'),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -389,7 +391,7 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
                               ),
                               SizedBox(height: 3),
                               Text(
-                                'Đổi quà & quản lý vàng',
+                                tr('Đổi quà & quản lý vàng', 'Redeem gifts & manage gold'),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -444,8 +446,8 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          const Text(
-                            'Dùng coin để đổi phần thưởng sau khi hoàn thành nhiệm vụ.',
+                          Text(
+                            tr('Dùng coin để đổi phần thưởng sau khi hoàn thành nhiệm vụ.', 'Use coins to redeem rewards after completing quests.'),
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 14,
@@ -462,7 +464,7 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
                                     backgroundColor: Colors.white,
                                     foregroundColor: const Color(0xffff8a00),
                                   ),
-                                  child: const Text('Đổi quà ngay'),
+                                  child: Text(tr('Đổi quà ngay', 'Redeem now')),
                                 ),
                               ),
                               const SizedBox(width: 12),
@@ -475,7 +477,7 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
                                       color: Colors.white54,
                                     ),
                                   ),
-                                  child: const Text('Lịch sử'),
+                                  child: Text(tr('Lịch sử', 'History')),
                                 ),
                               ),
                             ],
@@ -489,16 +491,16 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
                         statCard(
                           icon: '🎁',
                           value: '${rewards.length}',
-                          label: 'Quà tặng',
+                          label: tr('Quà tặng', 'Gifts'),
                         ),
                         const SizedBox(width: 12),
                         statCard(
                           icon: '✅',
                           value: '${rewardProvider.redeemedCount}',
-                          label: 'Đã đổi',
+                          label: tr('Đã đổi', 'Redeemed'),
                         ),
                         const SizedBox(width: 12),
-                        statCard(icon: '🔥', value: '4', label: 'Chuỗi ngày'),
+                        statCard(icon: '🔥', value: '4', label: tr('Chuỗi ngày', 'Streak')),
                       ],
                     ),
                     const SizedBox(height: 18),
@@ -512,12 +514,12 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
                         borderRadius: BorderRadius.circular(22),
                         border: Border.all(color: const Color(0xffeee3fb)),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
                           Text('🔍', style: TextStyle(fontSize: 20)),
                           SizedBox(width: 10),
                           Text(
-                            'Tìm reward, voucher, phần thưởng...',
+                            tr('Tìm reward, voucher, phần thưởng...', 'Search rewards, vouchers, gifts...'),
                             style: TextStyle(
                               color: Color(0xff8b7c99),
                               fontSize: 14,
@@ -600,8 +602,8 @@ class _ChildRewardScreenState extends State<ChildRewardScreen> {
                     ),
                     const SizedBox(height: 12),
                     if (history.isEmpty)
-                      const Text(
-                        'Chưa có lịch sử đổi thưởng',
+                      Text(
+                        tr('Chưa có lịch sử đổi thưởng', 'No redemption history yet'),
                         style: TextStyle(color: Color(0xff8b7c99)),
                       )
                     else

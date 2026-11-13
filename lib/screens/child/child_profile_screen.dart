@@ -12,6 +12,7 @@ import '../auth/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert';
 
+import '../../providers/language_provider.dart';
 class ChildProfileScreen extends StatelessWidget {
   const ChildProfileScreen({super.key});
 
@@ -281,6 +282,7 @@ class ChildProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final taskProvider = context.watch<TaskProvider>();
     final rewardProvider = context.watch<RewardProvider>();
     final achievementProvider = context.watch<AchievementProvider>();
@@ -317,7 +319,7 @@ class ChildProfileScreen extends StatelessWidget {
 
         final phone = user['phone'] ?? '';
 
-        final linkCode = user['linkCode'] ?? 'Chưa có';
+        final linkCode = user['linkCode'] ?? tr('Chưa có', 'None yet');
 
         final isLinked = (user['parentId'] ?? '').toString().isNotEmpty;
 
@@ -339,7 +341,7 @@ class ChildProfileScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       topButton('←', () => Navigator.pop(context)),
-                      const Column(
+                      Column(
                         children: [
                           Text(
                             'Child Profile',
@@ -351,7 +353,7 @@ class ChildProfileScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 3),
                           Text(
-                            'Hồ sơ người chơi',
+                            tr('Hồ sơ người chơi', 'Player profile'),
                             style: TextStyle(
                               color: Color(0xff8b7c99),
                               fontSize: 13,
@@ -401,8 +403,8 @@ class ChildProfileScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        const Text(
-                          'Young Hero\nHoàn thành nhiệm vụ để nhận EXP và mở khóa huy hiệu',
+                        Text(
+                          tr('Young Hero\nHoàn thành nhiệm vụ để nhận EXP và mở khóa huy hiệu', 'Young Hero\nComplete quests to earn EXP and unlock badges'),
                           textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.white, height: 1.5),
                         ),
@@ -475,38 +477,38 @@ class ChildProfileScreen extends StatelessWidget {
                       statCard(
                         icon: '📋',
                         value: '${taskProvider.tasks.length}',
-                        label: 'Nhiệm vụ',
+                        label: tr('Nhiệm vụ', 'Quests'),
                       ),
                       const SizedBox(width: 12),
                       statCard(
                         icon: '🏆',
                         value: '$unlockedAchievements',
-                        label: 'Huy hiệu',
+                        label: tr('Huy hiệu', 'Badges'),
                       ),
                       const SizedBox(width: 12),
                       statCard(
                         icon: '⭐',
                         value: '${rewardProvider.coins}',
-                        label: 'Vàng',
+                        label: tr('Vàng', 'Gold'),
                       ),
                     ],
                   ),
-                  sectionTitle('Thành tựu nổi bật', action: 'Xem tất cả'),
+                  sectionTitle(tr('Thành tựu nổi bật', 'Featured achievements'), action: tr('Xem tất cả', 'View all')),
                   achievementCard(
                     icon: '📚',
-                    title: 'Hiệp sĩ học tập',
-                    subtitle: 'Hoàn thành 10 nhiệm vụ học tập',
+                    title: tr('Hiệp sĩ học tập', 'Study Knight'),
+                    subtitle: tr('Hoàn thành 10 nhiệm vụ học tập', 'Complete 10 study quests'),
                     status: '8/10',
                     progress: 0.8,
                   ),
                   achievementCard(
                     icon: '🧹',
-                    title: 'Bậc thầy gọn gàng',
-                    subtitle: 'Hoàn thành 5 nhiệm vụ dọn dẹp',
-                    status: 'HOÀN THÀNH',
+                    title: tr('Bậc thầy gọn gàng', 'Tidy Master'),
+                    subtitle: tr('Hoàn thành 5 nhiệm vụ dọn dẹp', 'Complete 5 cleaning quests'),
+                    status: tr('HOÀN THÀNH', 'COMPLETED'),
                     progress: 1,
                   ),
-                  sectionTitle('Thông tin cá nhân'),
+                  sectionTitle(tr('Thông tin cá nhân', 'Personal information')),
                   Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
@@ -517,27 +519,27 @@ class ChildProfileScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         infoRow('Email', email),
-                        infoRow('Số điện thoại', phone),
-                        infoRow('Vai trò', 'Con cái'),
-                        infoRow('Mã liên kết', linkCode),
+                        infoRow(tr('Số điện thoại', 'Phone number'), phone),
+                        infoRow(tr('Vai trò', 'Role'), tr('Con cái', 'Children')),
+                        infoRow(tr('Mã liên kết', 'Link code'), linkCode),
                         infoRow(
-                          'Trạng thái',
-                          isLinked ? 'Đã liên kết' : 'Chưa liên kết',
+                          tr('Trạng thái', 'Status'),
+                          isLinked ? tr('Đã liên kết', 'Linked') : tr('Chưa liên kết', 'Not linked'),
                         ),
-                        infoRow('Tham gia', 'Học kỳ I 2026'),
+                        infoRow('Tham gia', tr('Học kỳ I 2026', 'Semester I 2026')),
                       ],
                     ),
                   ),
-                  sectionTitle('Cài đặt'),
+                  sectionTitle(tr('Cài đặt', 'Settings')),
                   settingCard(
                     icon: '🔔',
-                    title: 'Nhắc nhở nhiệm vụ',
-                    subtitle: 'Nhắc nhở nhiệm vụ hằng ngày',
+                    title: tr('Nhắc nhở nhiệm vụ', 'Quest reminders'),
+                    subtitle: tr('Nhắc nhở nhiệm vụ hằng ngày', 'Daily quest reminders'),
                   ),
                   settingCard(
                     icon: '🎨',
-                    title: 'Hình đại diện & Nhân vật',
-                    subtitle: 'Đổi nhân vật và giao diện',
+                    title: tr('Hình đại diện & Nhân vật', 'Avatar & Character'),
+                    subtitle: tr('Đổi nhân vật và giao diện', 'Change character and theme'),
                   ),
                   FilledButton(
                     onPressed: () async {
@@ -555,8 +557,8 @@ class ChildProfileScreen extends StatelessWidget {
 
                       if (updated == true && context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Cập nhật thông tin thành công'),
+                          SnackBar(
+                            content: Text(tr('Cập nhật thông tin thành công', 'Profile updated successfully')),
                           ),
                         );
                       }
@@ -565,7 +567,7 @@ class ChildProfileScreen extends StatelessWidget {
                       minimumSize: const Size.fromHeight(56),
                       backgroundColor: const Color(0xffff9f43),
                     ),
-                    child: const Text('Chỉnh sửa thông tin'),
+                    child: Text(tr('Chỉnh sửa thông tin', 'Edit profile')),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton(
@@ -586,7 +588,7 @@ class ChildProfileScreen extends StatelessWidget {
                       backgroundColor: const Color(0xfffff0f0),
                       side: const BorderSide(color: Color(0xffffd4d4)),
                     ),
-                    child: const Text('Đăng xuất'),
+                    child: Text(tr('Đăng xuất', 'Log out')),
                   ),
                 ],
               ),

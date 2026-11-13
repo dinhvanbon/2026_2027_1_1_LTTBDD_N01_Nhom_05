@@ -12,6 +12,7 @@ import '../shared/achievement_screen.dart';
 import '../shared/activity_log_screen.dart';
 import '../shared/settings_screen.dart';
 
+import '../../providers/language_provider.dart';
 class ChildHomeScreen extends StatelessWidget {
   const ChildHomeScreen({super.key});
 
@@ -20,13 +21,13 @@ class ChildHomeScreen extends StatelessWidget {
 
     switch (value) {
       case 'submitted':
-        return 'CHỜ DUYỆT';
+        return tr('CHỜ DUYỆT', 'PENDING');
       case 'approved':
-        return 'HOÀN THÀNH';
+        return tr('HOÀN THÀNH', 'COMPLETED');
       case 'rejected':
-        return 'TỪ CHỐI';
+        return tr('TỪ CHỐI', 'REJECTED');
       default:
-        return 'CẦN LÀM';
+        return tr('CẦN LÀM', 'TO DO');
     }
   }
 
@@ -288,6 +289,7 @@ class ChildHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final tasks = context.watch<TaskProvider>().tasks;
 
     return Scaffold(
@@ -457,8 +459,8 @@ class ChildHomeScreen extends StatelessWidget {
 
                             const SizedBox(height: 8),
 
-                            const Text(
-                              'Sẵn sàng hoàn thành nhiệm vụ hôm nay chưa?',
+                            Text(
+                              tr('Sẵn sàng hoàn thành nhiệm vụ hôm nay chưa?', 'Ready to complete today quests?'),
                               style: TextStyle(color: Colors.grey),
                             ),
                           ],
@@ -508,21 +510,21 @@ class ChildHomeScreen extends StatelessWidget {
                         buildStatCard(
                           icon: Icons.task_alt,
                           value: tasks.length.toString(),
-                          label: 'Nhiệm vụ',
+                          label: tr('Nhiệm vụ', 'Quests'),
                           color: Colors.blue,
                         ),
                         const SizedBox(width: 12),
                         buildStatCard(
                           icon: Icons.stars,
                           value: coins.toString(),
-                          label: 'Vàng',
+                          label: tr('Vàng', 'Gold'),
                           color: Colors.orange,
                         ),
                         const SizedBox(width: 12),
                         buildStatCard(
                           icon: Icons.local_fire_department,
                           value: '0',
-                          label: 'Chuỗi ngày',
+                          label: tr('Chuỗi ngày', 'Streak'),
                           color: Colors.redAccent,
                         ),
                       ],
@@ -577,8 +579,8 @@ class ChildHomeScreen extends StatelessWidget {
 
                     const SizedBox(height: 24),
 
-                    const Text(
-                      'Truy cập nhanh',
+                    Text(
+                      tr('Truy cập nhanh', 'Quick access'),
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -592,7 +594,7 @@ class ChildHomeScreen extends StatelessWidget {
                         buildQuickCard(
                           context: context,
                           icon: Icons.task_alt,
-                          label: 'Nhiệm vụ',
+                          label: tr('Nhiệm vụ', 'Quests'),
                           color: Colors.blue,
                           screen: const ChildTaskScreen(),
                         ),
@@ -600,7 +602,7 @@ class ChildHomeScreen extends StatelessWidget {
                         buildQuickCard(
                           context: context,
                           icon: Icons.emoji_events,
-                          label: 'Huy hiệu',
+                          label: tr('Huy hiệu', 'Badges'),
                           color: Colors.orange,
                           screen: const AchievementScreen(),
                         ),
@@ -608,7 +610,7 @@ class ChildHomeScreen extends StatelessWidget {
                         buildQuickCard(
                           context: context,
                           icon: Icons.card_giftcard,
-                          label: 'Đổi quà',
+                          label: tr('Đổi quà', 'Redeem'),
                           color: Colors.purple,
                           screen: const ChildRewardScreen(),
                         ),
@@ -640,8 +642,8 @@ class ChildHomeScreen extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.history),
-                        label: const Text(
-                          'Nhật ký hoạt động',
+                        label: Text(
+                          tr('Nhật ký hoạt động', 'Activity log'),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
@@ -653,8 +655,8 @@ class ChildHomeScreen extends StatelessWidget {
 
             const SizedBox(height: 32),
 
-            const Text(
-              'Nhiệm vụ hàng ngày',
+            Text(
+              tr('Nhiệm vụ hàng ngày', 'Daily quests'),
               style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
 
@@ -666,13 +668,13 @@ class ChildHomeScreen extends StatelessWidget {
                 );
               },
               icon: const Icon(Icons.open_in_new),
-              label: const Text('Xem tất cả'),
+              label: Text(tr('Xem tất cả', 'View all')),
             ),
 
             const SizedBox(height: 20),
 
             if (tasks.isEmpty)
-              const Center(child: Text('Chưa có nhiệm vụ'))
+              Center(child: Text(tr('Chưa có nhiệm vụ', 'No quests yet')))
             else
               Column(
                 children: tasks.take(3).map((task) {
@@ -689,9 +691,9 @@ class ChildHomeScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Thành tựu nổi bật',
+                    tr('Thành tựu nổi bật', 'Featured achievements'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -706,15 +708,15 @@ class ChildHomeScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Text('Tất cả'),
+                  child: Text(tr('Tất cả', 'All')),
                 ),
               ],
             ),
 
             buildSuggestionCard(
               icon: Icons.menu_book,
-              title: 'Hiệp sĩ học tập',
-              subtitle: 'Hoàn thành nhiệm vụ để mở khóa thêm thành tựu.',
+              title: tr('Hiệp sĩ học tập', 'Study Knight'),
+              subtitle: tr('Hoàn thành nhiệm vụ để mở khóa thêm thành tựu.', 'Complete quests to unlock more achievements.'),
               color: Colors.orange,
             ),
 
@@ -723,9 +725,9 @@ class ChildHomeScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
-                    'Gợi ý đổi quà',
+                    tr('Gợi ý đổi quà', 'Reward suggestions'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
@@ -740,17 +742,17 @@ class ChildHomeScreen extends StatelessWidget {
                       ),
                     );
                   },
-                  child: const Text('Cửa hàng'),
+                  child: Text(tr('Cửa hàng', 'Shop')),
                 ),
               ],
             ),
 
             buildSuggestionCard(
               icon: Icons.videogame_asset,
-              title: 'Giờ chơi game',
-              subtitle: 'Dùng vàng để đổi phần thưởng từ phụ huynh.',
+              title: tr('Giờ chơi game', 'Game time'),
+              subtitle: tr('Dùng vàng để đổi phần thưởng từ phụ huynh.', 'Use gold to redeem rewards from your parents.'),
               color: Colors.purple,
-              buttonText: 'Đổi ngay',
+              buttonText: tr('Đổi ngay', 'Redeem now'),
               onPressed: () {
                 Navigator.push(
                   context,

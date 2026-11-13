@@ -8,6 +8,7 @@ import '../../providers/activity_provider.dart';
 import '../../services/task_service.dart';
 import 'dart:convert';
 
+import '../../providers/language_provider.dart';
 class ChildTaskScreen extends StatefulWidget {
   const ChildTaskScreen({super.key});
 
@@ -147,7 +148,7 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
             ],
           ),
           child: Text(
-            label,
+            trv(label),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
@@ -168,17 +169,17 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Gửi nhiệm vụ'),
+          title: Text(tr('Gửi nhiệm vụ', 'Submit quest')),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Thêm ghi chú và minh chứng hoàn thành nhiệm vụ.'),
+              Text(tr('Thêm ghi chú và minh chứng hoàn thành nhiệm vụ.', 'Add a note and proof of quest completion.')),
               const SizedBox(height: 16),
               TextField(
                 controller: noteController,
                 maxLines: 3,
-                decoration: const InputDecoration(
-                  labelText: 'Ghi chú của trẻ',
+                decoration: InputDecoration(
+                  labelText: tr('Ghi chú của trẻ', 'Child note'),
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -195,8 +196,8 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
                   children: [
                     Text(
                       selectedImage == null
-                          ? 'Chưa chọn ảnh minh chứng'
-                          : 'Đã chọn: ${selectedImage!.name}',
+                          ? tr('Chưa chọn ảnh minh chứng', 'No proof image selected')
+                          : tr('Đã chọn: ${selectedImage!.name}', 'Selected: ${selectedImage!.name}'),
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                         fontSize: 15,
@@ -211,7 +212,7 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
                             onPressed: () =>
                                 pickProofImage(ImageSource.gallery),
                             icon: const Icon(Icons.photo_library),
-                            label: const Text('Thư viện'),
+                            label: Text(tr('Thư viện', 'Gallery')),
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -219,7 +220,7 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
                           child: OutlinedButton.icon(
                             onPressed: () => pickProofImage(ImageSource.camera),
                             icon: const Icon(Icons.camera_alt),
-                            label: const Text('Chụp ảnh'),
+                            label: Text(tr('Chụp ảnh', 'Take photo')),
                           ),
                         ),
                       ],
@@ -237,14 +238,14 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
                 });
                 Navigator.pop(dialogContext);
               },
-              child: const Text('Hủy'),
+              child: Text(tr('Hủy', 'Cancel')),
             ),
             FilledButton(
               onPressed: () async {
                 if (selectedImage == null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Vui lòng chọn hoặc chụp ảnh minh chứng.'),
+                    SnackBar(
+                      content: Text(tr('Vui lòng chọn hoặc chụp ảnh minh chứng.', 'Please choose or take a proof photo.')),
                     ),
                   );
                   return;
@@ -252,14 +253,14 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
 
                 if (noteController.text.trim().length > 200) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Ghi chú tối đa 200 ký tự.')),
+                    SnackBar(content: Text(tr('Ghi chú tối đa 200 ký tự.', 'Note must be at most 200 characters.'))),
                   );
                   return;
                 }
 
                 final imageToSubmit = selectedImage;
                 final noteText = noteController.text.trim().isEmpty
-                    ? 'Con đã hoàn thành nhiệm vụ được giao rồi ạ.'
+                    ? tr('Con đã hoàn thành nhiệm vụ được giao rồi ạ.', 'I have completed the assigned quest.')
                     : noteController.text.trim();
 
                 Navigator.of(dialogContext).pop();
@@ -290,17 +291,17 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
                   if (!context.mounted) return;
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Đã gửi nhiệm vụ')),
+                    SnackBar(content: Text(tr('Đã gửi nhiệm vụ', 'Quest submitted'))),
                   );
                 } catch (e) {
                   if (!context.mounted) return;
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Lỗi gửi nhiệm vụ: $e')),
+                    SnackBar(content: Text(tr('Lỗi gửi nhiệm vụ: $e', 'Submit error: $e'))),
                   );
                 }
               },
-              child: const Text('Gửi'),
+              child: Text(tr('Gửi', 'Submit')),
             ),
           ],
         );
@@ -385,7 +386,7 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  isExpired ? 'Expired' : getStatusText(task.status),
+                  isExpired ? tr('Hết hạn', 'Expired') : trv(getStatusText(task.status)),
                   style: TextStyle(
                     color: statusColor,
                     fontSize: 13,
@@ -474,6 +475,7 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<LanguageProvider>();
     final tasks = context.watch<TaskProvider>().tasks;
 
     final filteredTasks = filterTasks(tasks);
@@ -507,8 +509,8 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
 
                 const SizedBox(height: 10),
 
-                const Text(
-                  'Theo dõi tiến độ nhiệm vụ',
+                Text(
+                  tr('Theo dõi tiến độ nhiệm vụ', 'Track quest progress'),
                   style: TextStyle(
                     color: Color(0xff8b7c99),
                     fontSize: 16,
@@ -522,7 +524,7 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
                   children: [
                     buildSummaryCard(
                       value: tasks.length.toString(),
-                      label: 'Tổng số',
+                      label: tr('Tổng số', 'Total'),
                       icon: Icons.task_alt,
                       color: Colors.blue,
                     ),
@@ -532,7 +534,7 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
                           .where((task) => task.status == TaskStatus.pending)
                           .length
                           .toString(),
-                      label: 'Cần làm',
+                      label: tr('Cần làm', 'To do'),
                       icon: Icons.hourglass_top,
                       color: Colors.orange,
                     ),
@@ -542,7 +544,7 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
                           .where((task) => task.status == TaskStatus.approved)
                           .length
                           .toString(),
-                      label: 'Đã xong',
+                      label: tr('Đã xong', 'Done'),
                       icon: Icons.check_circle,
                       color: Colors.green,
                     ),
@@ -568,11 +570,11 @@ class _ChildTaskScreenState extends State<ChildTaskScreen> {
                 const SizedBox(height: 24),
 
                 if (filteredTasks.isEmpty)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.only(top: 80),
                     child: Center(
                       child: Text(
-                        'Chưa có nhiệm vụ nào',
+                        tr('Chưa có nhiệm vụ nào', 'No quests yet'),
                         style: TextStyle(
                           color: Colors.grey,
                           fontWeight: FontWeight.bold,
